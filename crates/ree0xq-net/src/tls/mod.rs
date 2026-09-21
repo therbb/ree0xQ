@@ -120,7 +120,7 @@ pub fn parse_handshake(buf: &[u8]) -> Result<HandshakeSummary, ParseError> {
         HandshakeKind::ClientHello => {
             // cipher_suites <2..2^16-2>
             let cs_bytes = c.read_u16()? as usize;
-            if cs_bytes % 2 != 0 {
+            if !cs_bytes.is_multiple_of(2) {
                 return Err(ParseError::LengthMismatch {
                     claimed: cs_bytes,
                     available: c.remaining(),
