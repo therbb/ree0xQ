@@ -36,7 +36,10 @@ pub fn primitives_for(key_type: &str, key_size_bits: Option<u32>) -> Vec<Primiti
             vec![sig("ECDSA-P521", false, None, None), hash_sha("SHA-512")]
         }
         "ECDSA-SECP256K1" | "ECC-SECG-P256K1" => {
-            vec![sig("ECDSA-secp256k1", false, None, None), hash_sha("SHA-256")]
+            vec![
+                sig("ECDSA-secp256k1", false, None, None),
+                hash_sha("SHA-256"),
+            ]
         }
         "ED25519" => vec![sig("Ed25519", false, None, None)],
         "ED448" => vec![sig("Ed448", false, None, None)],
@@ -75,12 +78,7 @@ pub fn primitives_for(key_type: &str, key_size_bits: Option<u32>) -> Vec<Primiti
     }
 }
 
-fn sig(
-    name: &str,
-    pq: bool,
-    level: Option<NistLevel>,
-    bits: Option<u32>,
-) -> Primitive {
+fn sig(name: &str, pq: bool, level: Option<NistLevel>, bits: Option<u32>) -> Primitive {
     let algorithm = match bits {
         Some(b) => format!("{name}-{b}"),
         None => name.to_string(),

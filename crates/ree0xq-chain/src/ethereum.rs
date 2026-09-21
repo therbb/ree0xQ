@@ -110,12 +110,8 @@ mod tests {
         assert!(!is_valid("0x"));
         assert!(!is_valid("0xshort"));
         assert!(!is_valid("d8da6bf26964af9d7eed9e03e53415d37aa96045")); // no 0x
-        assert!(!is_valid(
-            "0xd8da6bf26964af9d7eed9e03e53415d37aa96045ZZ"
-        )); // wrong length + non-hex
-        assert!(!is_valid(
-            "0xd8da6bf26964af9d7eed9e03e53415d37aa9604z"
-        )); // non-hex
+        assert!(!is_valid("0xd8da6bf26964af9d7eed9e03e53415d37aa96045ZZ")); // wrong length + non-hex
+        assert!(!is_valid("0xd8da6bf26964af9d7eed9e03e53415d37aa9604z")); // non-hex
     }
 
     #[test]

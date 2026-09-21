@@ -53,10 +53,7 @@ pub struct ScanStats {
 /// discovered cert. Errors thrown by the visitor close out the
 /// scan with that error; everything else (read errors, parse
 /// errors) is folded into [`ScanStats`].
-pub fn host_scan<F>(
-    roots: &[PathBuf],
-    mut on_event: F,
-) -> Result<ScanStats>
+pub fn host_scan<F>(roots: &[PathBuf], mut on_event: F) -> Result<ScanStats>
 where
     F: FnMut(ree0xq_core::CryptoInventoryEvent),
 {
@@ -116,11 +113,8 @@ where
     Ok(stats)
 }
 
-fn emit_certs<F>(
-    certs: &[ParsedCert],
-    stats: &mut ScanStats,
-    on_event: &mut F,
-) where
+fn emit_certs<F>(certs: &[ParsedCert], stats: &mut ScanStats, on_event: &mut F)
+where
     F: FnMut(ree0xq_core::CryptoInventoryEvent),
 {
     for cert in certs {
@@ -191,11 +185,8 @@ mod tests {
 
     #[test]
     fn nonexistent_root_does_not_error() {
-        let stats = host_scan(
-            &[PathBuf::from("/tmp/ree0xq-does-not-exist-xyzzy")],
-            |_| {},
-        )
-        .unwrap();
+        let stats =
+            host_scan(&[PathBuf::from("/tmp/ree0xq-does-not-exist-xyzzy")], |_| {}).unwrap();
         assert_eq!(stats.roots_walked, 1);
         assert_eq!(stats.events_emitted, 0);
     }

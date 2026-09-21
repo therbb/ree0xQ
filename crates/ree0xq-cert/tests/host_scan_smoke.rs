@@ -35,8 +35,7 @@ fn write_fixture(dir: &std::path::Path, names: &[&str]) {
     use std::io::Write;
     for name in names {
         let kp = KeyPair::generate_for(&rcgen::PKCS_ECDSA_P256_SHA256).unwrap();
-        let mut params =
-            CertificateParams::new(vec![format!("{name}.example.com")]).unwrap();
+        let mut params = CertificateParams::new(vec![format!("{name}.example.com")]).unwrap();
         let mut dn = DistinguishedName::new();
         dn.push(DnType::CommonName, format!("{name}.example.com"));
         params.distinguished_name = dn;
@@ -66,9 +65,16 @@ async fn host_scan_to_collector_roundtrip() {
             .build()
             .unwrap();
         scan::host_scan(&[root], |ev| {
-            identities_clone.lock().unwrap().push(ev.asset.identity.clone());
+            identities_clone
+                .lock()
+                .unwrap()
+                .push(ev.asset.identity.clone());
             let r = client.post(&url).json(&ev).send().expect("POST");
-            assert!(r.status().is_success(), "collector rejected: {}", r.status());
+            assert!(
+                r.status().is_success(),
+                "collector rejected: {}",
+                r.status()
+            );
         })
         .expect("host_scan")
     })

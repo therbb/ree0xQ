@@ -207,8 +207,14 @@ fn observe_pcap_emits_event_for_synthesised_client_hello() {
         names.contains(&"X25519+ML-KEM-768"),
         "missing PQ kex; got {names:?}"
     );
-    assert!(names.contains(&"X25519"), "missing classical kex; got {names:?}");
-    assert!(names.contains(&"ML-DSA-65"), "missing PQ sig; got {names:?}");
+    assert!(
+        names.contains(&"X25519"),
+        "missing classical kex; got {names:?}"
+    );
+    assert!(
+        names.contains(&"ML-DSA-65"),
+        "missing PQ sig; got {names:?}"
+    );
     assert!(
         names.contains(&"AES-256-GCM"),
         "missing AEAD; got {names:?}"

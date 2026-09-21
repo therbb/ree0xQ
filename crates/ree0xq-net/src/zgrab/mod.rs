@@ -40,8 +40,8 @@
 //! The adapter is tolerant: missing fields produce empty primitive
 //! lists; the posture engine downstream treats absence as `unknown`.
 
-use serde::{Deserialize, Serialize};
 use ree0xq_core::{CryptoInventoryEvent, Primitive, PrimitiveRole};
+use serde::{Deserialize, Serialize};
 
 use crate::algos;
 
@@ -193,8 +193,12 @@ pub fn primitives_from_zgrab(record: &ZgrabRecord) -> Vec<Primitive> {
     let Some(tls) = &record.data.tls else {
         return out;
     };
-    let Some(result) = &tls.result else { return out };
-    let Some(hs) = &result.handshake_log else { return out };
+    let Some(result) = &tls.result else {
+        return out;
+    };
+    let Some(hs) = &result.handshake_log else {
+        return out;
+    };
 
     if let Some(sh) = &hs.server_hello {
         if let Some(cs) = &sh.cipher_suite {

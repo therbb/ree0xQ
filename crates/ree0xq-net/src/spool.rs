@@ -118,8 +118,7 @@ impl Spool {
             return Ok(DrainStats::default());
         }
 
-        let input = File::open(&path)
-            .with_context(|| format!("open spool {}", path.display()))?;
+        let input = File::open(&path).with_context(|| format!("open spool {}", path.display()))?;
         let reader = BufReader::new(input);
 
         let tmp_path = path.with_extension("draining");
@@ -189,7 +188,9 @@ impl Spool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ree0xq_core::{Asset, AssetKind, Posture, Primitive, PrimitiveRole, SCHEMA_MINOR, SCHEMA_VERSION};
+    use ree0xq_core::{
+        Asset, AssetKind, Posture, Primitive, PrimitiveRole, SCHEMA_MINOR, SCHEMA_VERSION,
+    };
     use tempfile::tempdir;
 
     fn fixture(identity: &str) -> CryptoInventoryEvent {

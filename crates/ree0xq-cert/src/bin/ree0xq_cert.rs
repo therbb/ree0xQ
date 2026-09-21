@@ -235,7 +235,12 @@ fn run_ct_scan(
     collector: Option<String>,
     spool_dir: Option<PathBuf>,
 ) -> anyhow::Result<()> {
-    info!(?domains, ?cursor_path, rate_delay_ms, "starting ct-scan (crt.sh)");
+    info!(
+        ?domains,
+        ?cursor_path,
+        rate_delay_ms,
+        "starting ct-scan (crt.sh)"
+    );
     let backend = CrtShBackend::new()?;
     let cfg = CtScanConfig {
         domains,

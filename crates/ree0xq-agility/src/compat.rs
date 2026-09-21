@@ -52,7 +52,10 @@ pub struct CompatEntry {
 /// `stack` and `algorithm`.
 pub fn stack_supports(stack: &str, algorithm: &str) -> SupportStatus {
     let key = (stack.to_ascii_lowercase(), algorithm.to_ascii_lowercase());
-    matrix().get(&key).map(|e| e.status).unwrap_or(SupportStatus::Unknown)
+    matrix()
+        .get(&key)
+        .map(|e| e.status)
+        .unwrap_or(SupportStatus::Unknown)
 }
 
 /// Lookup with the full entry (including version + source).
@@ -269,10 +272,8 @@ mod tests {
 
     #[test]
     fn matrix_covers_at_least_four_stacks() {
-        let stacks: std::collections::HashSet<String> = matrix()
-            .keys()
-            .map(|(s, _)| s.clone())
-            .collect();
+        let stacks: std::collections::HashSet<String> =
+            matrix().keys().map(|(s, _)| s.clone()).collect();
         assert!(
             stacks.len() >= 4,
             "compat matrix should cover ≥ 4 stacks; got {stacks:?}"

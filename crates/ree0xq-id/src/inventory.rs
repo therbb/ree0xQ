@@ -95,8 +95,14 @@ where
                 slot.hsm_model.as_deref().unwrap_or("(unknown model)"),
                 key.key_id,
                 key.key_type,
-                key.key_size_bits.map(|b| format!(" {b}b")).unwrap_or_default(),
-                if key.usage.is_empty() { "?".into() } else { key.usage.join(",") },
+                key.key_size_bits
+                    .map(|b| format!(" {b}b"))
+                    .unwrap_or_default(),
+                if key.usage.is_empty() {
+                    "?".into()
+                } else {
+                    key.usage.join(",")
+                },
             );
             on_event(build_event(identity, host.clone(), prims, rationale));
             stats.events_emitted += 1;
@@ -110,8 +116,7 @@ pub fn scan_file<F>(path: &str, on_event: F) -> Result<ScanStats>
 where
     F: FnMut(ree0xq_core::CryptoInventoryEvent),
 {
-    let raw = std::fs::read_to_string(path)
-        .with_context(|| format!("read inventory {path}"))?;
+    let raw = std::fs::read_to_string(path).with_context(|| format!("read inventory {path}"))?;
     let inv: Vec<SlotInventory> =
         serde_json::from_str(&raw).with_context(|| format!("parse inventory {path}"))?;
     Ok(scan(&inv, on_event))
@@ -171,10 +176,7 @@ mod tests {
             assert_eq!(ev.asset.kind, AssetKind::HsmSlot);
         }
         // Identity convention: vendor/slot/key_id.
-        let identities: Vec<&str> = events
-            .iter()
-            .map(|e| e.asset.identity.as_str())
-            .collect();
+        let identities: Vec<&str> = events.iter().map(|e| e.asset.identity.as_str()).collect();
         assert!(identities.contains(&"Thales nShield/0/ca-sign-2024"));
         assert!(identities.contains(&"YubiHSM 2/1/code-sign-pq"));
     }

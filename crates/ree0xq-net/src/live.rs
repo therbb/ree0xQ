@@ -118,8 +118,7 @@ where
 {
     let path = path.as_ref();
     let file = std::fs::File::open(path).map_err(|e| LiveError::Open(e.to_string()))?;
-    let mut reader =
-        PcapReader::new(file).map_err(|e| LiveError::Open(e.to_string()))?;
+    let mut reader = PcapReader::new(file).map_err(|e| LiveError::Open(e.to_string()))?;
     let mut stats = ObservationStats::default();
 
     while let Some(pkt) = reader.next_packet() {

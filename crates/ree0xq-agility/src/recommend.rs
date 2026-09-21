@@ -96,7 +96,9 @@ fn recommend_for_sig(p: &Primitive, out: &mut Vec<Recommendation>) {
         out.push(Recommendation {
             replaces: algo.into(),
             replacement: format!("SLH-DSA-SHA2-{}s", level.slh_dsa_size()),
-            rationale: "FIPS 205 SLH-DSA: hash-based fallback if ML-DSA lattice family proves unstable.".into(),
+            rationale:
+                "FIPS 205 SLH-DSA: hash-based fallback if ML-DSA lattice family proves unstable."
+                    .into(),
             cost: Cost::High,
             caveats: vec![
                 "Signatures are 8-50 KB — non-trivial for TLS handshake size.".into(),

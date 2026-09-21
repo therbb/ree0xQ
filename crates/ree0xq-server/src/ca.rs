@@ -23,8 +23,7 @@ use anyhow::{anyhow, Context, Result};
 use parking_lot::Mutex;
 use rcgen::{
     BasicConstraints, Certificate, CertificateParams, DistinguishedName, DnType,
-    ExtendedKeyUsagePurpose, IsCa, KeyPair, KeyUsagePurpose, PKCS_ECDSA_P256_SHA256,
-    SanType,
+    ExtendedKeyUsagePurpose, IsCa, KeyPair, KeyUsagePurpose, SanType, PKCS_ECDSA_P256_SHA256,
 };
 use serde::Serialize;
 use tracing::info;
@@ -60,8 +59,7 @@ impl Ca {
     /// persist both files, and return the freshly built CA.
     /// The key file is created at mode 0600 on unix targets.
     pub fn load_or_init(dir: &Path) -> Result<Self> {
-        fs::create_dir_all(dir)
-            .with_context(|| format!("create CA dir {}", dir.display()))?;
+        fs::create_dir_all(dir).with_context(|| format!("create CA dir {}", dir.display()))?;
         let cert_path = dir.join(CA_CERT_FILE);
         let key_path = dir.join(CA_KEY_FILE);
 
@@ -93,8 +91,8 @@ impl Ca {
         };
 
         let keypair = KeyPair::from_pem(&key_pem).context("parse CA private key PEM")?;
-        let params = CertificateParams::from_ca_cert_pem(&cert_pem)
-            .context("parse CA certificate PEM")?;
+        let params =
+            CertificateParams::from_ca_cert_pem(&cert_pem).context("parse CA certificate PEM")?;
         // Re-self-sign so we have a Certificate handle for the
         // signed_by() flow. The DER will differ from `cert_pem`
         // on the timestamp/serial axes, but the public key and

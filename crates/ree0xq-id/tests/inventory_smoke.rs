@@ -77,7 +77,10 @@ async fn inventory_scan_round_trips_through_collector() {
             .build()
             .unwrap();
         let stats = inventory::scan(&inv, |ev| {
-            identities_clone.lock().unwrap().push(ev.asset.identity.clone());
+            identities_clone
+                .lock()
+                .unwrap()
+                .push(ev.asset.identity.clone());
             let r = client.post(&url_clone).json(&ev).send().expect("POST");
             assert!(r.status().is_success(), "{}", r.status());
         });

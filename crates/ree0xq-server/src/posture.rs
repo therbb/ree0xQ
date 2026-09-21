@@ -15,8 +15,8 @@
 
 use chrono::{DateTime, Utc};
 use ree0xq_core::{
-    AgilityBlock, AgilityLevel, ChannelProtection, ChannelState, CryptoInventoryEvent,
-    Primitive, PrimitiveRole,
+    AgilityBlock, AgilityLevel, ChannelProtection, ChannelState, CryptoInventoryEvent, Primitive,
+    PrimitiveRole,
 };
 
 /// Default role weights for axis A (paper §2.1).
@@ -191,7 +191,11 @@ mod tests {
         }
     }
 
-    fn event(prims: Vec<Primitive>, cp: Option<ChannelProtection>, ag: Option<AgilityBlock>) -> CryptoInventoryEvent {
+    fn event(
+        prims: Vec<Primitive>,
+        cp: Option<ChannelProtection>,
+        ag: Option<AgilityBlock>,
+    ) -> CryptoInventoryEvent {
         CryptoInventoryEvent {
             schema_version: SCHEMA_VERSION,
             schema_minor: SCHEMA_MINOR,
@@ -205,7 +209,11 @@ mod tests {
             primitives: prims,
             channel_protection: cp,
             agility: ag,
-            posture: Posture { score: 0, rationale: "".into(), recommended_replacement: None },
+            posture: Posture {
+                score: 0,
+                rationale: "".into(),
+                recommended_replacement: None,
+            },
         }
     }
 
@@ -268,7 +276,10 @@ mod tests {
         let now = chrono::Utc.with_ymd_and_hms(2026, 5, 13, 0, 0, 0).unwrap();
         let d = chrono::Utc.with_ymd_and_hms(2030, 1, 1, 0, 0, 0).unwrap();
         let q = q_for_event(&ev, now, d, 5.0);
-        assert!((q - 0.544).abs() < 0.01, "expected paper §3.1 q≈0.544, got {q}");
+        assert!(
+            (q - 0.544).abs() < 0.01,
+            "expected paper §3.1 q≈0.544, got {q}"
+        );
     }
 
     #[test]
@@ -295,7 +306,10 @@ mod tests {
         let now = chrono::Utc.with_ymd_and_hms(2026, 5, 13, 0, 0, 0).unwrap();
         let d = chrono::Utc.with_ymd_and_hms(2030, 1, 1, 0, 0, 0).unwrap();
         let q = q_for_event(&ev, now, d, 5.0);
-        assert!((q - 0.392).abs() < 0.01, "expected paper §3.1 q≈0.392, got {q}");
+        assert!(
+            (q - 0.392).abs() < 0.01,
+            "expected paper §3.1 q≈0.392, got {q}"
+        );
     }
 
     #[test]

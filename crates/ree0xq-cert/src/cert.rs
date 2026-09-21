@@ -41,10 +41,7 @@ pub struct ParsedCert {
 /// yielding one [`ParsedCert`] per cert. Skips non-`CERTIFICATE`
 /// blocks (CRLs, private keys, …) without raising. Errors only
 /// when the input isn't valid PEM at all.
-pub fn parse_pem_bundle(
-    pem_bytes: &[u8],
-    source_path: Option<&Path>,
-) -> Result<Vec<ParsedCert>> {
+pub fn parse_pem_bundle(pem_bytes: &[u8], source_path: Option<&Path>) -> Result<Vec<ParsedCert>> {
     use std::io::{BufReader, Cursor};
     use x509_parser::pem::Pem;
 
@@ -75,8 +72,8 @@ pub fn parse_pem_bundle(
 
 /// Build a `crypto_inventory_event` from one parsed cert.
 pub fn event_from_cert(cert: &ParsedCert) -> Result<CryptoInventoryEvent> {
-    let (_, parsed) = X509Certificate::from_der(&cert.der)
-        .map_err(|e| anyhow!("x509 parse: {e}"))?;
+    let (_, parsed) =
+        X509Certificate::from_der(&cert.der).map_err(|e| anyhow!("x509 parse: {e}"))?;
 
     let fingerprint = sha256_hex(&cert.der);
     let cn = subject_cn(&parsed).unwrap_or_else(|| fingerprint.clone());
@@ -90,8 +87,12 @@ pub fn event_from_cert(cert: &ParsedCert) -> Result<CryptoInventoryEvent> {
         "X.509 cert CN={cn} sig={} key={} bytes; valid {}..{}",
         sig_algo_name(&parsed),
         public_key_byte_len(&parsed),
-        not_before.map(|t| t.to_rfc3339()).unwrap_or_else(|| "?".into()),
-        not_after.map(|t| t.to_rfc3339()).unwrap_or_else(|| "?".into()),
+        not_before
+            .map(|t| t.to_rfc3339())
+            .unwrap_or_else(|| "?".into()),
+        not_after
+            .map(|t| t.to_rfc3339())
+            .unwrap_or_else(|| "?".into()),
     );
 
     Ok(CryptoInventoryEvent {
@@ -123,12 +124,15 @@ fn subject_cn(cert: &X509Certificate<'_>) -> Option<String> {
 }
 
 fn first_san(cert: &X509Certificate<'_>) -> Option<String> {
-    cert.subject_alternative_name().ok().flatten().and_then(|s| {
-        s.value.general_names.iter().find_map(|gn| match gn {
-            GeneralName::DNSName(n) => Some((*n).to_string()),
-            _ => None,
+    cert.subject_alternative_name()
+        .ok()
+        .flatten()
+        .and_then(|s| {
+            s.value.general_names.iter().find_map(|gn| match gn {
+                GeneralName::DNSName(n) => Some((*n).to_string()),
+                _ => None,
+            })
         })
-    })
 }
 
 fn sha256_hex(bytes: &[u8]) -> String {
@@ -147,16 +151,16 @@ fn sig_algo_name(cert: &X509Certificate<'_>) -> &'static str {
     // a well-formed cert). We use the outer one.
     let oid = &cert.signature_algorithm.algorithm;
     match oid.to_id_string().as_str() {
-        "1.2.840.113549.1.1.5"  => "RSA-PKCS1-SHA1",
+        "1.2.840.113549.1.1.5" => "RSA-PKCS1-SHA1",
         "1.2.840.113549.1.1.11" => "RSA-PKCS1-SHA256",
         "1.2.840.113549.1.1.12" => "RSA-PKCS1-SHA384",
         "1.2.840.113549.1.1.13" => "RSA-PKCS1-SHA512",
         "1.2.840.113549.1.1.10" => "RSA-PSS",
-        "1.2.840.10045.4.3.2"   => "ECDSA-SHA256",
-        "1.2.840.10045.4.3.3"   => "ECDSA-SHA384",
-        "1.2.840.10045.4.3.4"   => "ECDSA-SHA512",
-        "1.3.101.112"           => "Ed25519",
-        "1.3.101.113"           => "Ed448",
+        "1.2.840.10045.4.3.2" => "ECDSA-SHA256",
+        "1.2.840.10045.4.3.3" => "ECDSA-SHA384",
+        "1.2.840.10045.4.3.4" => "ECDSA-SHA512",
+        "1.3.101.112" => "Ed25519",
+        "1.3.101.113" => "Ed448",
         // ML-DSA per NIST FIPS 204 — IANA / IETF OIDs as
         // they land. (Placeholder.)
         "2.16.840.1.101.3.4.3.17" => "ML-DSA-44",
@@ -196,16 +200,16 @@ fn primitives_for(cert: &X509Certificate<'_>) -> Result<Vec<Primitive>> {
 /// primitive.
 fn decompose_sig(sig: &str) -> (&str, bool, Option<&str>) {
     match sig {
-        "RSA-PKCS1-SHA1"   => ("RSA-PKCS1", false, Some("SHA-1")),
+        "RSA-PKCS1-SHA1" => ("RSA-PKCS1", false, Some("SHA-1")),
         "RSA-PKCS1-SHA256" => ("RSA-PKCS1", false, Some("SHA-256")),
         "RSA-PKCS1-SHA384" => ("RSA-PKCS1", false, Some("SHA-384")),
         "RSA-PKCS1-SHA512" => ("RSA-PKCS1", false, Some("SHA-512")),
-        "RSA-PSS"          => ("RSA-PSS", false, None),
-        "ECDSA-SHA256"     => ("ECDSA", false, Some("SHA-256")),
-        "ECDSA-SHA384"     => ("ECDSA", false, Some("SHA-384")),
-        "ECDSA-SHA512"     => ("ECDSA", false, Some("SHA-512")),
-        "Ed25519"          => ("Ed25519", false, None),
-        "Ed448"            => ("Ed448", false, None),
+        "RSA-PSS" => ("RSA-PSS", false, None),
+        "ECDSA-SHA256" => ("ECDSA", false, Some("SHA-256")),
+        "ECDSA-SHA384" => ("ECDSA", false, Some("SHA-384")),
+        "ECDSA-SHA512" => ("ECDSA", false, Some("SHA-512")),
+        "Ed25519" => ("Ed25519", false, None),
+        "Ed448" => ("Ed448", false, None),
         "ML-DSA-44" | "ML-DSA-65" | "ML-DSA-87" => (sig, true, None),
         _ => (sig, false, None),
     }

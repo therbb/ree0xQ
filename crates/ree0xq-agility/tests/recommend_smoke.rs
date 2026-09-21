@@ -142,10 +142,7 @@ async fn recommend_canonical_replacements_per_asset_kind() {
             .map(|name| prim(classify_role(name), name))
             .collect();
         let recs = recommend::recommend_for(&prims);
-        got.insert(
-            identity,
-            recs.into_iter().map(|r| r.replacement).collect(),
-        );
+        got.insert(identity, recs.into_iter().map(|r| r.replacement).collect());
     }
 
     // RSA-2048 → ML-DSA-44 (and SLH-DSA fallback).

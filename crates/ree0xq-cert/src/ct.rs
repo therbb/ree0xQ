@@ -108,8 +108,7 @@ impl CtBackend for CrtShBackend {
         if !r.status().is_success() {
             return Err(anyhow!("crt.sh list returned {}", r.status()));
         }
-        let entries: Vec<CtListEntry> =
-            r.json().map_err(|e| anyhow!("crt.sh list JSON: {e}"))?;
+        let entries: Vec<CtListEntry> = r.json().map_err(|e| anyhow!("crt.sh list JSON: {e}"))?;
         Ok(entries)
     }
 
@@ -124,7 +123,9 @@ impl CtBackend for CrtShBackend {
         if !r.status().is_success() {
             return Err(anyhow!("crt.sh fetch id={id} returned {}", r.status()));
         }
-        Ok(r.bytes().map_err(|e| anyhow!("crt.sh fetch body: {e}"))?.to_vec())
+        Ok(r.bytes()
+            .map_err(|e| anyhow!("crt.sh fetch body: {e}"))?
+            .to_vec())
     }
 
     fn backend_label(&self) -> &'static str {
@@ -178,13 +179,12 @@ impl Cursor {
         if !path.exists() {
             return Ok(Self::default());
         }
-        let raw = fs::read_to_string(path)
-            .with_context(|| format!("read cursor {}", path.display()))?;
+        let raw =
+            fs::read_to_string(path).with_context(|| format!("read cursor {}", path.display()))?;
         if raw.trim().is_empty() {
             return Ok(Self::default());
         }
-        serde_json::from_str(&raw)
-            .with_context(|| format!("parse cursor {}", path.display()))
+        serde_json::from_str(&raw).with_context(|| format!("parse cursor {}", path.display()))
     }
 
     fn save(&self, path: &Path) -> Result<()> {
@@ -373,8 +373,7 @@ mod tests {
             rate_delay_ms: 0,
         };
         let mut emitted = Vec::new();
-        let stats =
-            ct_scan(&cfg, &backend, |ev| emitted.push(ev.asset.identity.clone())).unwrap();
+        let stats = ct_scan(&cfg, &backend, |ev| emitted.push(ev.asset.identity.clone())).unwrap();
 
         assert_eq!(stats.domains_scanned, 1);
         assert_eq!(stats.entries_listed, 3);
@@ -407,7 +406,10 @@ mod tests {
         };
         let stats = ct_scan(&cfg, &backend, |_| {}).unwrap();
         assert_eq!(stats.entries_listed, 3);
-        assert_eq!(stats.entries_below_cursor, 2, "ids 100 and 101 already seen");
+        assert_eq!(
+            stats.entries_below_cursor, 2,
+            "ids 100 and 101 already seen"
+        );
         assert_eq!(stats.certs_fetched, 1);
         assert_eq!(stats.events_emitted, 1);
 

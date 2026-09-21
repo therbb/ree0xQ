@@ -37,7 +37,12 @@ fn p(role: PrimitiveRole, algo: &str) -> Primitive {
     }
 }
 
-fn ev(source: &str, kind: AssetKind, identity: &str, prims: Vec<Primitive>) -> CryptoInventoryEvent {
+fn ev(
+    source: &str,
+    kind: AssetKind,
+    identity: &str,
+    prims: Vec<Primitive>,
+) -> CryptoInventoryEvent {
     CryptoInventoryEvent {
         schema_version: SCHEMA_VERSION,
         schema_minor: SCHEMA_MINOR,

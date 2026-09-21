@@ -52,7 +52,10 @@ async fn all_three_chains_round_trip_through_collector() {
             .build()
             .unwrap();
         let post = |ev: &ree0xq_core::CryptoInventoryEvent| {
-            identities_clone.lock().unwrap().push(ev.asset.identity.clone());
+            identities_clone
+                .lock()
+                .unwrap()
+                .push(ev.asset.identity.clone());
             let r = client.post(&url_clone).json(ev).send().expect("POST");
             assert!(r.status().is_success(), "{}", r.status());
         };

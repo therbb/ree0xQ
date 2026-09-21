@@ -25,8 +25,8 @@
 use std::net::SocketAddr;
 use std::time::Duration;
 
-use rustls::pki_types::{CertificateDer, PrivateKeyDer};
 use ree0xq_server::{ca::Ca, router_bootstrap, router_main, tls, AppState};
+use rustls::pki_types::{CertificateDer, PrivateKeyDer};
 
 const ADMIN_SECRET: &str = "test-admin-secret-tls";
 
@@ -44,8 +44,8 @@ async fn spawn_tls_server() -> TestServer {
     let ca = Ca::load_or_init(tmp.path()).expect("ca init");
     let ca_cert_pem = ca.cert_pem();
 
-    let state = AppState::new_in_memory(tmp.path(), Some(ADMIN_SECRET.into()))
-        .expect("AppState init");
+    let state =
+        AppState::new_in_memory(tmp.path(), Some(ADMIN_SECRET.into())).expect("AppState init");
     std::mem::forget(tmp);
 
     let server_cert = state
@@ -59,9 +59,8 @@ async fn spawn_tls_server() -> TestServer {
         &server_cert.ca_cert_pem,
     )
     .expect("mtls config");
-    let boot_cfg =
-        tls::build_bootstrap_config(&server_cert.cert_pem, &server_cert.key_pem)
-            .expect("bootstrap config");
+    let boot_cfg = tls::build_bootstrap_config(&server_cert.cert_pem, &server_cert.key_pem)
+        .expect("bootstrap config");
 
     let mtls_addr: SocketAddr = "127.0.0.1:0".parse().unwrap();
     let bootstrap_addr: SocketAddr = "127.0.0.1:0".parse().unwrap();
@@ -124,8 +123,9 @@ async fn await_listening(handle: &axum_server::Handle) -> SocketAddr {
 
 fn ca_only_client(ca_pem: &str) -> reqwest::Client {
     let mut root_store = rustls::RootCertStore::empty();
-    for cert in
-        rustls_pemfile::certs(&mut ca_pem.as_bytes()).collect::<std::result::Result<Vec<_>, _>>().unwrap()
+    for cert in rustls_pemfile::certs(&mut ca_pem.as_bytes())
+        .collect::<std::result::Result<Vec<_>, _>>()
+        .unwrap()
     {
         root_store.add(cert).unwrap();
     }
@@ -140,8 +140,9 @@ fn ca_only_client(ca_pem: &str) -> reqwest::Client {
 
 fn mtls_client(ca_pem: &str, agent_cert_pem: &str, agent_key_pem: &str) -> reqwest::Client {
     let mut root_store = rustls::RootCertStore::empty();
-    for cert in
-        rustls_pemfile::certs(&mut ca_pem.as_bytes()).collect::<std::result::Result<Vec<_>, _>>().unwrap()
+    for cert in rustls_pemfile::certs(&mut ca_pem.as_bytes())
+        .collect::<std::result::Result<Vec<_>, _>>()
+        .unwrap()
     {
         root_store.add(cert).unwrap();
     }

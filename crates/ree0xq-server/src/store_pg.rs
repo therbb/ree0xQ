@@ -59,9 +59,7 @@ impl PgEventStore {
             .acquire_timeout(Duration::from_secs(DEFAULT_CONNECT_TIMEOUT_S))
             .connect(database_url)
             .await
-            .with_context(|| {
-                format!("connect to Postgres at {}", sanitised_url(database_url))
-            })?;
+            .with_context(|| format!("connect to Postgres at {}", sanitised_url(database_url)))?;
         info!(
             url = %sanitised_url(database_url),
             max_connections,

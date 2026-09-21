@@ -205,7 +205,13 @@ mod tests {
             link_key_rate_bps: None,
         };
         let j = serde_json::to_string(&s).unwrap();
-        assert!(!j.contains("link_qber"), "extension fields must be omitted when None: {j}");
-        assert!(!j.contains("link_key_rate_bps"), "extension fields must be omitted when None: {j}");
+        assert!(
+            !j.contains("link_qber"),
+            "extension fields must be omitted when None: {j}"
+        );
+        assert!(
+            !j.contains("link_key_rate_bps"),
+            "extension fields must be omitted when None: {j}"
+        );
     }
 }

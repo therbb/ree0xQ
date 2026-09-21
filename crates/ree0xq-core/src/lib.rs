@@ -412,7 +412,11 @@ mod tests {
     /// round-trip test can sweep every variant. Other fields are
     /// minimally plausible; we test serialization stability, not
     /// posture-rollup correctness.
-    fn fixture(kind: AssetKind, identity: &str, primitives: Vec<Primitive>) -> CryptoInventoryEvent {
+    fn fixture(
+        kind: AssetKind,
+        identity: &str,
+        primitives: Vec<Primitive>,
+    ) -> CryptoInventoryEvent {
         CryptoInventoryEvent {
             schema_version: SCHEMA_VERSION,
             schema_minor: SCHEMA_MINOR,
@@ -585,14 +589,20 @@ mod tests {
             "posture": {"score": 0, "rationale": "n/a"}
         }"#;
         let result: Result<CryptoInventoryEvent, _> = serde_json::from_str(json);
-        assert!(result.is_err(), "unknown AssetKind variant must fail to parse");
+        assert!(
+            result.is_err(),
+            "unknown AssetKind variant must fail to parse"
+        );
     }
 
     /// Parameters round-trip arbitrary JSON.
     #[test]
     fn parameters_carry_arbitrary_json() {
         let mut params = serde_json::Map::new();
-        params.insert("curve".into(), serde_json::Value::String("Curve25519".into()));
+        params.insert(
+            "curve".into(),
+            serde_json::Value::String("Curve25519".into()),
+        );
         params.insert("key_bits".into(), serde_json::Value::Number(256.into()));
         params.insert(
             "extensions".into(),
@@ -625,7 +635,11 @@ mod tests {
     /// NIST classification round-trips with UPPERCASE rename.
     #[test]
     fn nist_levels_serialize_uppercase() {
-        for (level, expected) in [(NistLevel::L1, "L1"), (NistLevel::L3, "L3"), (NistLevel::L5, "L5")] {
+        for (level, expected) in [
+            (NistLevel::L1, "L1"),
+            (NistLevel::L3, "L3"),
+            (NistLevel::L5, "L5"),
+        ] {
             let s = serde_json::to_string(&level).unwrap();
             assert_eq!(s, format!("\"{expected}\""));
         }
@@ -700,7 +714,10 @@ mod tests {
         assert_eq!(back.level, AgilityLevel::Configurable);
         assert_eq!(back.evidence.len(), 3);
         // Verify the tagged-union evidence preserves variant identity.
-        matches!(back.evidence[1], AgilityEvidence::FipsMode { detected: false });
+        matches!(
+            back.evidence[1],
+            AgilityEvidence::FipsMode { detected: false }
+        );
     }
 
     /// AgilityLevel::score must match the paper's §2.3 rubric exactly.
