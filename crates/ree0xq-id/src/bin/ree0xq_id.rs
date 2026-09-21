@@ -32,6 +32,10 @@ struct Args {
 }
 
 #[derive(Subcommand, Debug)]
+// Variant names become the CLI subcommands (`inventory-scan`,
+// `pkcs11-scan`, ...); dropping the shared `Scan` suffix would
+// rename them and break operator scripts + systemd units.
+#[allow(clippy::enum_variant_names)]
 enum Cmd {
     /// Offline JSON HSM-inventory scanner.
     InventoryScan {

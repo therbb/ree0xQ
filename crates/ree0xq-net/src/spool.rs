@@ -96,6 +96,11 @@ impl Spool {
         Ok(BufReader::new(f).lines().count())
     }
 
+    /// `true` when the spool holds no lines (or doesn't exist).
+    pub fn is_empty(&self) -> Result<bool> {
+        Ok(self.len()? == 0)
+    }
+
     /// Drain the spool: for each NDJSON line in order, call
     /// `emit`. Lines for which `emit` returned `Ok` are dropped
     /// from the spool; lines for which it returned `Err` are

@@ -104,14 +104,8 @@ async fn host_scan_to_collector_roundtrip() {
         // Every fixture cert is ECDSA-P256 + SHA-256 — sig +
         // hash primitive should be present.
         let names: Vec<&str> = prims.iter().map(|p| p.as_str().unwrap()).collect();
-        assert!(
-            names.iter().any(|n| *n == "ECDSA"),
-            "missing ECDSA in {names:?}"
-        );
-        assert!(
-            names.iter().any(|n| *n == "SHA-256"),
-            "missing SHA-256 in {names:?}"
-        );
+        assert!(names.contains(&"ECDSA"), "missing ECDSA in {names:?}");
+        assert!(names.contains(&"SHA-256"), "missing SHA-256 in {names:?}");
     }
 
     // /v1/posture should now report 3 assets.

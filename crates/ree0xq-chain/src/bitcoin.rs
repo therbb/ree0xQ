@@ -115,7 +115,7 @@ pub fn classify(address: &str) -> Option<ScriptType> {
     let lower = trimmed.to_ascii_lowercase();
     // bech32 (SegWit v0 / v1). bech32 is case-insensitive
     // by spec; we lowercase before checking.
-    if let Some(suffix) = lower
+    if let Some(_suffix) = lower
         .strip_prefix("bc1q")
         .or_else(|| lower.strip_prefix("tb1q"))
     {

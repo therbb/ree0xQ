@@ -262,10 +262,8 @@ fn run_live_ebpf(
 /// - no `collector`           → NDJSON to stdout
 /// - `collector` only         → POST; on failure, log + drop
 /// - `collector` + `spool`    → POST; on failure, append to the
-///                              disk spool. The spool is drained
-///                              once at construction time so
-///                              outage-buffered events go out
-///                              first.
+///   disk spool. The spool is drained once at construction
+///   time so outage-buffered events go out first.
 struct Sink {
     collector: Option<String>,
     client: Option<reqwest::blocking::Client>,
@@ -351,6 +349,9 @@ impl Sink {
     }
 }
 
+// Mirrors the `live` subcommand's CLI flags one-to-one; bundling
+// them into a struct is a refactor, not a lint fix.
+#[allow(clippy::too_many_arguments)]
 fn run_live(
     pcap_path: Option<String>,
     iface: Option<String>,

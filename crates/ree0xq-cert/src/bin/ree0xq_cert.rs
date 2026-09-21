@@ -35,6 +35,10 @@ struct Args {
 }
 
 #[derive(Subcommand, Debug)]
+// Variant names become the CLI subcommands (`host-scan`, ...);
+// dropping the shared `Scan` suffix would rename them and break
+// operator scripts + systemd units.
+#[allow(clippy::enum_variant_names)]
 enum Cmd {
     /// Walk one or more filesystem roots and emit a
     /// `crypto_inventory_event` for every X.509 cert

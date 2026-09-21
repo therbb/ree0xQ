@@ -17,10 +17,10 @@ use ree0xq_net::live;
 /// Build a minimal TLS 1.3 ClientHello *body* (everything after the
 /// 5-byte TLSPlaintext record header). Includes:
 /// - cipher_suites = [TLS_AES_256_GCM_SHA384 (0x1302),
-///                    TLS_AES_128_GCM_SHA256 (0x1301)]
+///   TLS_AES_128_GCM_SHA256 (0x1301)]
 /// - supported_groups = [X25519MLKEM768 (0x11ec), x25519 (0x001d)]
 /// - signature_algorithms = [mldsa65 (0x0905),
-///                           ecdsa_secp256r1_sha256 (0x0403)]
+///   ecdsa_secp256r1_sha256 (0x0403)]
 /// - supported_versions = [0x0304]
 fn sample_client_hello() -> Vec<u8> {
     let mut body = Vec::new();

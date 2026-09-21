@@ -77,9 +77,8 @@ where
         }
         stats.addresses_classified += 1;
         let prims = primitives();
-        let rationale = format!(
-            "Ethereum address; EOA classification — spends with ECDSA-secp256k1 + Keccak-256. Contract-vs-EOA disambiguation requires a live RPC and is V3.x scope."
-        );
+        let rationale =
+            "Ethereum address; EOA classification — spends with ECDSA-secp256k1 + Keccak-256. Contract-vs-EOA disambiguation requires a live RPC and is V3.x scope.".to_string();
         debug!(address = %addr, "ethereum classify");
         let ev = build_event("ethereum", addr.trim(), prims, rationale);
         stats.events_emitted += 1;

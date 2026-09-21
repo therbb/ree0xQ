@@ -105,20 +105,17 @@ async fn all_three_chains_round_trip_through_collector() {
             names.iter().any(|n| n.contains("secp256k1")),
             "missing secp256k1 in {names:?}"
         );
-        assert!(names.iter().any(|n| *n == "SHA-256"));
+        assert!(names.contains(&"SHA-256"));
     }
     for it in &by_host["ethereum"] {
         let prims = it["primitives"].as_array().unwrap();
         let names: Vec<&str> = prims.iter().map(|p| p.as_str().unwrap()).collect();
-        assert!(names.iter().any(|n| *n == "ECDSA-secp256k1"));
-        assert!(names.iter().any(|n| *n == "Keccak-256"));
+        assert!(names.contains(&"ECDSA-secp256k1"));
+        assert!(names.contains(&"Keccak-256"));
     }
     for it in &by_host["qrl"] {
         let prims = it["primitives"].as_array().unwrap();
         let names: Vec<&str> = prims.iter().map(|p| p.as_str().unwrap()).collect();
-        assert!(
-            names.iter().any(|n| *n == "XMSS"),
-            "missing XMSS in {names:?}"
-        );
+        assert!(names.contains(&"XMSS"), "missing XMSS in {names:?}");
     }
 }

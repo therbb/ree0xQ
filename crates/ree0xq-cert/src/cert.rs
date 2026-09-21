@@ -300,9 +300,8 @@ mod tests {
         // BEGIN/END markers are present, rather than erroring.
         // Either outcome is acceptable; what we don't want is
         // a panic.
-        match r {
-            Ok(v) => assert!(v.is_empty()),
-            Err(_) => {}
+        if let Ok(v) = r {
+            assert!(v.is_empty())
         }
     }
 }

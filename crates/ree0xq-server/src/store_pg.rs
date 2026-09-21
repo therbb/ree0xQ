@@ -71,12 +71,6 @@ impl PgEventStore {
             .context("run ree0xq-server migrations")?;
         Ok(Self { pool })
     }
-
-    /// Test helper: borrow the pool directly.
-    #[cfg(test)]
-    pub(crate) fn pool(&self) -> &Pool<Postgres> {
-        &self.pool
-    }
 }
 
 #[async_trait]
