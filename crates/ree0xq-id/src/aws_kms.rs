@@ -75,8 +75,13 @@ where
             "KMS key {} ({}{}{})",
             key.key_id,
             key.key_spec,
-            key.key_size_bits.map(|b| format!(" {b}b")).unwrap_or_default(),
-            key.usage.as_deref().map(|u| format!(", usage={u}")).unwrap_or_default(),
+            key.key_size_bits
+                .map(|b| format!(" {b}b"))
+                .unwrap_or_default(),
+            key.usage
+                .as_deref()
+                .map(|u| format!(", usage={u}"))
+                .unwrap_or_default(),
         );
         on_event(build_event(key.key_id.clone(), host, prims, rationale));
         stats.events_emitted += 1;
@@ -131,12 +136,7 @@ impl KmsBackend for AwsKmsBackend {
             let page = req.send().await?;
             for entry in page.keys() {
                 let key_id = entry.key_id().unwrap_or_default().to_string();
-                let desc = self
-                    .client
-                    .describe_key()
-                    .key_id(&key_id)
-                    .send()
-                    .await?;
+                let desc = self.client.describe_key().key_id(&key_id).send().await?;
                 let meta = match desc.key_metadata() {
                     Some(m) => m,
                     None => continue,
@@ -145,9 +145,7 @@ impl KmsBackend for AwsKmsBackend {
                     .key_spec()
                     .map(|s| aws_keyspec_to_algo(s.as_str()))
                     .unwrap_or_else(|| "unknown".into());
-                let bits = meta
-                    .key_spec()
-                    .and_then(|s| aws_keyspec_bits(s.as_str()));
+                let bits = meta.key_spec().and_then(|s| aws_keyspec_bits(s.as_str()));
                 out.push(KmsKeyInfo {
                     key_id: meta.arn().unwrap_or(&key_id).to_string(),
                     key_spec,
@@ -274,12 +272,18 @@ mod tests {
         assert_eq!(stats.events_emitted, 4);
 
         // Find each by identity and check primitives.
-        let rsa = events.iter().find(|e| e.asset.identity.contains("rsa")).unwrap();
+        let rsa = events
+            .iter()
+            .find(|e| e.asset.identity.contains("rsa"))
+            .unwrap();
         assert!(rsa
             .primitives
             .iter()
             .any(|p| p.role == PrimitiveRole::Sig && p.algorithm.starts_with("RSA-PKCS1")));
-        let pq = events.iter().find(|e| e.asset.identity.contains("pq")).unwrap();
+        let pq = events
+            .iter()
+            .find(|e| e.asset.identity.contains("pq"))
+            .unwrap();
         assert!(pq
             .primitives
             .iter()

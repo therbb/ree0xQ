@@ -88,9 +88,10 @@ pub fn scan_target(target: &ScanTarget, rules: &[CompiledRule]) -> AgilityBlock 
             }
             for (line_idx, line) in content.lines().enumerate().take(target.max_lines) {
                 if let Some(caps) = rule.regex.captures(line) {
-                    let algorithm = rule.rule.algorithm_capture.and_then(|i| {
-                        caps.get(i).map(|m| m.as_str().to_string())
-                    });
+                    let algorithm = rule
+                        .rule
+                        .algorithm_capture
+                        .and_then(|i| caps.get(i).map(|m| m.as_str().to_string()));
                     let snippet = line.chars().take(160).collect::<String>();
                     let ev = match rule.rule.evidence_kind {
                         EvidenceKind::ConfigPattern => AgilityEvidence::ConfigPattern {
@@ -195,7 +196,9 @@ fn classify_file(path: &Path) -> ScopeKind {
         "main.cf",
         "smb.conf",
     ];
-    if config_filenames.iter().any(|n| name.eq_ignore_ascii_case(n))
+    if config_filenames
+        .iter()
+        .any(|n| name.eq_ignore_ascii_case(n))
         || config_exts.contains(&ext)
     {
         return ScopeKind::Config;
@@ -301,9 +304,16 @@ fn aggregate_level(evidence: &[AgilityEvidence], rules: &[CompiledRule]) -> Agil
 fn matches_rule_evidence_kind(ev: &AgilityEvidence, rule: &CompiledRule) -> bool {
     matches!(
         (ev, rule.rule.evidence_kind),
-        (AgilityEvidence::ConfigPattern { .. }, EvidenceKind::ConfigPattern)
-            | (AgilityEvidence::CodePattern { .. }, EvidenceKind::CodePattern)
-            | (AgilityEvidence::FirmwareString { .. }, EvidenceKind::FirmwareString)
+        (
+            AgilityEvidence::ConfigPattern { .. },
+            EvidenceKind::ConfigPattern
+        ) | (
+            AgilityEvidence::CodePattern { .. },
+            EvidenceKind::CodePattern
+        ) | (
+            AgilityEvidence::FirmwareString { .. },
+            EvidenceKind::FirmwareString
+        )
     )
 }
 
@@ -337,7 +347,10 @@ mod tests {
         let dir = TempDir::new().unwrap();
         let p = dir.path().join("r.yaml");
         fs::write(&p, content).unwrap();
-        crate::rules::load_ruleset(dir.path()).unwrap().pop().unwrap()
+        crate::rules::load_ruleset(dir.path())
+            .unwrap()
+            .pop()
+            .unwrap()
     }
 
     #[test]
@@ -386,7 +399,10 @@ evidence_kind: config_pattern
 
     #[test]
     fn glob_match_basic_cases() {
-        assert!(glob_match("**/nginx*.conf", Path::new("/etc/nginx/nginx.conf")));
+        assert!(glob_match(
+            "**/nginx*.conf",
+            Path::new("/etc/nginx/nginx.conf")
+        ));
         assert!(glob_match("**/nginx*.conf", Path::new("nginx-1.27.conf")));
         assert!(glob_match("*.conf", Path::new("nginx.conf")));
         assert!(!glob_match("*.conf", Path::new("nginx.cfg")));

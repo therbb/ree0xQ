@@ -6,7 +6,7 @@ Fires on every push to `main` and every PR. Jobs:
 
 | Job   | What it does                                              | Runs on             |
 |-------|-----------------------------------------------------------|---------------------|
-| rust  | `cargo check / clippy / fmt --check / test` on stable + MSRV (1.78). Treats warnings as errors. | matrix: stable, 1.78 |
+| rust  | `cargo check / clippy / fmt --check / test` on stable + MSRV (1.88), `--locked` against the committed `Cargo.lock`. Treats warnings as errors. | matrix: stable, 1.88 |
 | web   | `npm ci && npm run build` (tsc + Vite). Fails if the gzipped JS bundle exceeds the 300 KB budget. | ubuntu-latest |
 | paper | Installs Pandoc + WeasyPrint, runs `docs/paper/build.sh`, verifies both PDFs exist + non-empty. Uploads PDFs as a 14-day artifact. | ubuntu-latest |
 

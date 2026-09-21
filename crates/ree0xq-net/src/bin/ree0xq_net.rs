@@ -227,9 +227,7 @@ fn run_live_ebpf(
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()?;
-    let stats = rt.block_on(async {
-        live_iface::run(cfg, |ev| sink.send(&ev)).await
-    })?;
+    let stats = rt.block_on(async { live_iface::run(cfg, |ev| sink.send(&ev)).await })?;
     info!(
         source = "live-ebpf",
         iface = %iface,
@@ -264,10 +262,8 @@ fn run_live_ebpf(
 /// - no `collector`           → NDJSON to stdout
 /// - `collector` only         → POST; on failure, log + drop
 /// - `collector` + `spool`    → POST; on failure, append to the
-///                              disk spool. The spool is drained
-///                              once at construction time so
-///                              outage-buffered events go out
-///                              first.
+///   disk spool. The spool is drained once at construction
+///   time so outage-buffered events go out first.
 struct Sink {
     collector: Option<String>,
     client: Option<reqwest::blocking::Client>,
@@ -275,10 +271,7 @@ struct Sink {
 }
 
 impl Sink {
-    fn new(
-        collector: Option<String>,
-        spool_dir: Option<PathBuf>,
-    ) -> anyhow::Result<Self> {
+    fn new(collector: Option<String>, spool_dir: Option<PathBuf>) -> anyhow::Result<Self> {
         let client = collector
             .as_deref()
             .map(|_| {
@@ -306,8 +299,7 @@ impl Sink {
     }
 
     fn drain_spool(&self) {
-        let (Some(spool), Some(url), Some(client)) =
-            (&self.spool, &self.collector, &self.client)
+        let (Some(spool), Some(url), Some(client)) = (&self.spool, &self.collector, &self.client)
         else {
             return;
         };
@@ -357,6 +349,9 @@ impl Sink {
     }
 }
 
+// Mirrors the `live` subcommand's CLI flags one-to-one; bundling
+// them into a struct is a refactor, not a lint fix.
+#[allow(clippy::too_many_arguments)]
 fn run_live(
     pcap_path: Option<String>,
     iface: Option<String>,
@@ -383,8 +378,7 @@ fn run_live(
 
     match (pcap_path, iface) {
         (Some(p), None) => {
-            let stats =
-                live::observe_pcap_with_dedup(&p, dedup_cache.as_mut(), |ev| emit(&ev))?;
+            let stats = live::observe_pcap_with_dedup(&p, dedup_cache.as_mut(), |ev| emit(&ev))?;
             info!(
                 source = "pcap-file",
                 packets_seen = stats.packets_seen,
@@ -392,20 +386,17 @@ fn run_live(
                 handshakes_deduplicated = stats.handshakes_deduplicated,
                 events_emitted = stats.events_emitted,
                 skipped_unparseable = stats.packets_skipped_unparseable,
-                dedup_forced_evictions =
-                    dedup_cache.as_ref().map(|c| c.forced_evictions()).unwrap_or(0),
+                dedup_forced_evictions = dedup_cache
+                    .as_ref()
+                    .map(|c| c.forced_evictions())
+                    .unwrap_or(0),
                 "observation complete"
             );
             Ok(())
         }
-        (None, Some(if_name)) => run_live_iface(
-            if_name,
-            filter,
-            promiscuous,
-            snaplen,
-            dedup_cache,
-            emit,
-        ),
+        (None, Some(if_name)) => {
+            run_live_iface(if_name, filter, promiscuous, snaplen, dedup_cache, emit)
+        }
         (None, None) => {
             anyhow::bail!("live: pass either --pcap <file> or --iface <name>")
         }
@@ -432,7 +423,11 @@ where
         iface: iface.clone(),
         snaplen,
         read_timeout_ms: 100,
-        filter: if filter.is_empty() { None } else { Some(filter) },
+        filter: if filter.is_empty() {
+            None
+        } else {
+            Some(filter)
+        },
         promiscuous,
     };
 
@@ -451,12 +446,10 @@ where
     }
 
     info!(iface = %cfg.iface, filter = ?cfg.filter, "live-pcap observation starting");
-    let stats = live::observe_interface_with_dedup(
-        &cfg,
-        &should_stop,
-        dedup_cache.as_mut(),
-        |ev| emit(&ev),
-    )?;
+    let stats =
+        live::observe_interface_with_dedup(&cfg, &should_stop, dedup_cache.as_mut(), |ev| {
+            emit(&ev)
+        })?;
     info!(
         source = "live-pcap",
         iface = %iface,
@@ -599,10 +592,13 @@ fn run_parse_handshake(hex_arg: String) -> anyhow::Result<()> {
     let bytes = hex::decode(clean.trim_start_matches("0x"))?;
     let summary = tls::parse_handshake(&bytes)?;
     let prims = tls::primitives_from_summary(&summary);
-    println!("{}", serde_json::to_string_pretty(&serde_json::json!({
-        "summary": summary,
-        "primitives": prims,
-    }))?);
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&serde_json::json!({
+            "summary": summary,
+            "primitives": prims,
+        }))?
+    );
     Ok(())
 }
 

@@ -96,6 +96,11 @@ impl Spool {
         Ok(BufReader::new(f).lines().count())
     }
 
+    /// `true` when the spool holds no lines (or doesn't exist).
+    pub fn is_empty(&self) -> Result<bool> {
+        Ok(self.len()? == 0)
+    }
+
     /// Drain the spool: for each NDJSON line in order, call
     /// `emit`. Lines for which `emit` returned `Ok` are dropped
     /// from the spool; lines for which it returned `Err` are
@@ -118,8 +123,7 @@ impl Spool {
             return Ok(DrainStats::default());
         }
 
-        let input = File::open(&path)
-            .with_context(|| format!("open spool {}", path.display()))?;
+        let input = File::open(&path).with_context(|| format!("open spool {}", path.display()))?;
         let reader = BufReader::new(input);
 
         let tmp_path = path.with_extension("draining");
@@ -189,7 +193,9 @@ impl Spool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ree0xq_core::{Asset, AssetKind, Posture, Primitive, PrimitiveRole, SCHEMA_MINOR, SCHEMA_VERSION};
+    use ree0xq_core::{
+        Asset, AssetKind, Posture, Primitive, PrimitiveRole, SCHEMA_MINOR, SCHEMA_VERSION,
+    };
     use tempfile::tempdir;
 
     fn fixture(identity: &str) -> CryptoInventoryEvent {

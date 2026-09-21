@@ -160,7 +160,8 @@ mod tests {
 
     #[test]
     fn table_has_five_or_more_jurisdictions() {
-        let js: std::collections::HashSet<String> = all().into_iter().map(|e| e.jurisdiction).collect();
+        let js: std::collections::HashSet<String> =
+            all().into_iter().map(|e| e.jurisdiction).collect();
         // US-NSA, US-NIST, EU-ANSSI, DE-BSI, UK-NCSC.
         assert!(js.len() >= 5, "got jurisdictions: {js:?}");
     }
@@ -168,10 +169,7 @@ mod tests {
     #[test]
     fn every_entry_has_a_source_url() {
         for e in all() {
-            assert!(
-                e.source.starts_with("http"),
-                "entry without source: {e:?}"
-            );
+            assert!(e.source.starts_with("http"), "entry without source: {e:?}");
         }
     }
 

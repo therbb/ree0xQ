@@ -77,9 +77,8 @@ where
         }
         stats.addresses_classified += 1;
         let prims = primitives();
-        let rationale = format!(
-            "Ethereum address; EOA classification — spends with ECDSA-secp256k1 + Keccak-256. Contract-vs-EOA disambiguation requires a live RPC and is V3.x scope."
-        );
+        let rationale =
+            "Ethereum address; EOA classification — spends with ECDSA-secp256k1 + Keccak-256. Contract-vs-EOA disambiguation requires a live RPC and is V3.x scope.".to_string();
         debug!(address = %addr, "ethereum classify");
         let ev = build_event("ethereum", addr.trim(), prims, rationale);
         stats.events_emitted += 1;
@@ -110,12 +109,8 @@ mod tests {
         assert!(!is_valid("0x"));
         assert!(!is_valid("0xshort"));
         assert!(!is_valid("d8da6bf26964af9d7eed9e03e53415d37aa96045")); // no 0x
-        assert!(!is_valid(
-            "0xd8da6bf26964af9d7eed9e03e53415d37aa96045ZZ"
-        )); // wrong length + non-hex
-        assert!(!is_valid(
-            "0xd8da6bf26964af9d7eed9e03e53415d37aa9604z"
-        )); // non-hex
+        assert!(!is_valid("0xd8da6bf26964af9d7eed9e03e53415d37aa96045ZZ")); // wrong length + non-hex
+        assert!(!is_valid("0xd8da6bf26964af9d7eed9e03e53415d37aa9604z")); // non-hex
     }
 
     #[test]

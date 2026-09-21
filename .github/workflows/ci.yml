@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [stable, "1.78"]   # 1.78 = workspace.package.rust-version
+        toolchain: [stable, "1.88"]   # 1.88 = workspace.package.rust-version
     steps:
       - uses: actions/checkout@v4
 
@@ -59,21 +59,21 @@ jobs:
           shared-key: ${{ matrix.toolchain }}
 
       - name: cargo check
-        run: cargo check --workspace --all-targets
+        run: cargo check --workspace --all-targets --locked
 
       - name: cargo clippy
         # Stable only — MSRV often lags clippy lint updates by a
         # release or two. Type-checking on MSRV is still useful;
         # lint failures on MSRV are not.
         if: matrix.toolchain == 'stable'
-        run: cargo clippy --workspace --all-targets -- -D warnings
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
 
       - name: cargo fmt --check
         if: matrix.toolchain == 'stable'
         run: cargo fmt --all -- --check
 
       - name: cargo test
-        run: cargo test --workspace --no-fail-fast
+        run: cargo test --workspace --no-fail-fast --locked
 
   web:
     name: web (TypeScript + Vite)
@@ -115,7 +115,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
               pandoc \
-              python3-weasyprint \
+              weasyprint \
               fonts-dejavu-core \
               fonts-stix
           pandoc --version | head -1

@@ -42,7 +42,7 @@ jobs:
           cargo install --locked cargo-deb cargo-generate-rpm
 
       - name: cargo build --release
-        run: cargo build --release --workspace
+        run: cargo build --release --workspace --locked
 
       - name: make packages-deb
         run: make packages-deb
@@ -73,7 +73,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-              pandoc python3-weasyprint zip \
+              pandoc weasyprint zip \
               fonts-dejavu-core fonts-stix
 
       - name: Build both submission bundles

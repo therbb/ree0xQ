@@ -102,7 +102,8 @@ impl DedupCache {
         // in the cache size but bounded by `capacity`, so per-event
         // cost stays well under the 500 µs userspace budget for a
         // 64K cache.
-        self.entries.retain(|_, t| now.duration_since(*t) < self.ttl);
+        self.entries
+            .retain(|_, t| now.duration_since(*t) < self.ttl);
 
         if self.entries.len() >= self.capacity {
             // Evict the oldest entry by `Instant`. We don't keep an

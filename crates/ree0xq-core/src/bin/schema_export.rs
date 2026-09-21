@@ -5,8 +5,8 @@
 //! Build / run:
 //!     cargo run --features schema --bin schema-export > schema.json
 
-use schemars::schema_for;
 use ree0xq_core::CryptoInventoryEvent;
+use schemars::schema_for;
 
 fn main() {
     let schema = schema_for!(CryptoInventoryEvent);

@@ -120,7 +120,7 @@ pub fn parse_handshake(buf: &[u8]) -> Result<HandshakeSummary, ParseError> {
         HandshakeKind::ClientHello => {
             // cipher_suites <2..2^16-2>
             let cs_bytes = c.read_u16()? as usize;
-            if cs_bytes % 2 != 0 {
+            if !cs_bytes.is_multiple_of(2) {
                 return Err(ParseError::LengthMismatch {
                     claimed: cs_bytes,
                     available: c.remaining(),
@@ -396,13 +396,13 @@ mod tests {
     /// - random = 32 zero bytes
     /// - legacy_session_id = empty (1 length byte = 0)
     /// - cipher_suites = [TLS_AES_256_GCM_SHA384 (0x1302),
-    ///                    TLS_AES_128_GCM_SHA256 (0x1301)]
+    ///   TLS_AES_128_GCM_SHA256 (0x1301)]
     /// - legacy_compression_methods = [0]
     /// - extensions:
-    ///     supported_groups (0x000a): [X25519MLKEM768 (0x11ec), x25519 (0x001d)]
-    ///     signature_algorithms (0x000d): [mldsa65 (0x0905),
-    ///                                     ecdsa_secp256r1_sha256 (0x0403)]
-    ///     supported_versions (0x002b): [0x0304]
+    ///   - supported_groups (0x000a): [X25519MLKEM768 (0x11ec), x25519 (0x001d)]
+    ///   - signature_algorithms (0x000d): [mldsa65 (0x0905),
+    ///     ecdsa_secp256r1_sha256 (0x0403)]
+    ///   - supported_versions (0x002b): [0x0304]
     fn sample_client_hello() -> Vec<u8> {
         let mut body = Vec::new();
         // legacy_version

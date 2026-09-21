@@ -5,8 +5,8 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use serde::{Deserialize, Serialize};
 use ree0xq_core::{AssetKind, CryptoInventoryEvent, SCHEMA_VERSION};
+use serde::{Deserialize, Serialize};
 use tracing::{debug, warn};
 
 use crate::posture;
@@ -122,11 +122,7 @@ pub async fn inventory(
             host: ev.asset.host.clone(),
             q,
             blocked,
-            primitives: ev
-                .primitives
-                .iter()
-                .map(|p| p.algorithm.clone())
-                .collect(),
+            primitives: ev.primitives.iter().map(|p| p.algorithm.clone()).collect(),
             observed_at: ev.observed_at,
         });
     }
@@ -144,7 +140,10 @@ pub async fn org_posture(
     let now = chrono::Utc::now();
     let events = st.store.latest_per_asset().await.map_err(store_err)?;
     let org = posture::org_score(&events, now, st.default_deadline, st.horizon_years);
-    let blocked_count = events.iter().filter(|e| posture::is_blocked(e.agility.as_ref())).count();
+    let blocked_count = events
+        .iter()
+        .filter(|e| posture::is_blocked(e.agility.as_ref()))
+        .count();
     let assets = events.len();
     Ok(Json(OrgPosture {
         org_q: org,
@@ -221,11 +220,7 @@ pub async fn recommendations(
             asset_kind: ev.asset.kind.clone(),
             identity: ev.asset.identity.clone(),
             host: ev.asset.host.clone(),
-            current_primitives: ev
-                .primitives
-                .iter()
-                .map(|p| p.algorithm.clone())
-                .collect(),
+            current_primitives: ev.primitives.iter().map(|p| p.algorithm.clone()).collect(),
             recommendations: recs,
         });
     }
@@ -240,9 +235,7 @@ pub async fn recommendations(
 /// (case-insensitive prefix) and/or `?horizon_days=N` to
 /// surface only deadlines that fall within the next `N`
 /// days from today.
-pub async fn agility_deadlines(
-    Query(q): Query<DeadlinesQuery>,
-) -> Json<DeadlinesResponse> {
+pub async fn agility_deadlines(Query(q): Query<DeadlinesQuery>) -> Json<DeadlinesResponse> {
     let mut items = if let Some(prefix) = q.jurisdiction.as_deref() {
         ree0xq_agility::deadlines::for_jurisdiction(prefix)
     } else {
@@ -269,23 +262,19 @@ pub async fn agility_compat(
     Query(q): Query<CompatQuery>,
 ) -> Result<Json<CompatResponse>, (StatusCode, Json<ApiError>)> {
     match (q.stack.as_deref(), q.algorithm.as_deref()) {
-        (Some(stack), Some(algo)) => {
-            match ree0xq_agility::compat::lookup(stack, algo) {
-                Some(e) => Ok(Json(CompatResponse {
-                    count: 1,
-                    items: vec![e],
-                })),
-                None => Err((
-                    StatusCode::NOT_FOUND,
-                    Json(ApiError {
-                        code: "compat_unknown".into(),
-                        message: format!(
-                            "no entry for stack={stack} algorithm={algo}"
-                        ),
-                    }),
-                )),
-            }
-        }
+        (Some(stack), Some(algo)) => match ree0xq_agility::compat::lookup(stack, algo) {
+            Some(e) => Ok(Json(CompatResponse {
+                count: 1,
+                items: vec![e],
+            })),
+            None => Err((
+                StatusCode::NOT_FOUND,
+                Json(ApiError {
+                    code: "compat_unknown".into(),
+                    message: format!("no entry for stack={stack} algorithm={algo}"),
+                }),
+            )),
+        },
         (Some(stack), None) => {
             let items = ree0xq_agility::compat::list_stack(stack);
             Ok(Json(CompatResponse {
@@ -328,8 +317,7 @@ pub async fn agility_compat(
 pub async fn agility_roadmap(
     State(st): State<AppState>,
     Json(plan): Json<RoadmapRequest>,
-) -> Result<Json<ree0xq_agility::roadmap::RoadmapProjection>, (StatusCode, Json<ApiError>)>
-{
+) -> Result<Json<ree0xq_agility::roadmap::RoadmapProjection>, (StatusCode, Json<ApiError>)> {
     let events = st.store.latest_per_asset().await.map_err(store_err)?;
     let now = chrono::Utc::now();
     let inventory: Vec<ree0xq_agility::roadmap::AssetSnapshot> = events
@@ -341,26 +329,20 @@ pub async fn agility_roadmap(
                 identity: ev.asset.identity.clone(),
                 q,
                 blocked,
-                primitives: ev
-                    .primitives
-                    .iter()
-                    .map(|p| p.algorithm.clone())
-                    .collect(),
+                primitives: ev.primitives.iter().map(|p| p.algorithm.clone()).collect(),
             }
         })
         .collect();
-    let projection =
-        ree0xq_agility::roadmap::project_roadmap(&inventory, &plan.milestones).map_err(
-            |e| {
-                (
-                    StatusCode::BAD_REQUEST,
-                    Json(ApiError {
-                        code: "roadmap_projection_failed".into(),
-                        message: e.to_string(),
-                    }),
-                )
-            },
-        )?;
+    let projection = ree0xq_agility::roadmap::project_roadmap(&inventory, &plan.milestones)
+        .map_err(|e| {
+            (
+                StatusCode::BAD_REQUEST,
+                Json(ApiError {
+                    code: "roadmap_projection_failed".into(),
+                    message: e.to_string(),
+                }),
+            )
+        })?;
     Ok(Json(projection))
 }
 

@@ -10,11 +10,11 @@
 
 use std::time::Duration;
 
-use reqwest::Client;
 use ree0xq_core::{
-    Asset, AssetKind, ChannelProtection, ChannelState, CryptoInventoryEvent, LinkHealth,
-    Posture, SCHEMA_MINOR, SCHEMA_VERSION,
+    Asset, AssetKind, ChannelProtection, ChannelState, CryptoInventoryEvent, LinkHealth, Posture,
+    SCHEMA_MINOR, SCHEMA_VERSION,
 };
+use reqwest::Client;
 use tracing::{debug, error, info, warn};
 
 use crate::etsi014::{paths, StatusResponse};
@@ -184,19 +184,14 @@ async fn poll_once(
         ));
     }
     let body: StatusResponse = resp.json().await?;
-    let (health, reason) = derive_link_health(
-        &body,
-        cfg.qber_warn_threshold,
-        cfg.qber_fail_threshold,
-    );
+    let (health, reason) =
+        derive_link_health(&body, cfg.qber_warn_threshold, cfg.qber_fail_threshold);
     Ok(build_kme_event(endpoint, &body, health, reason))
 }
 
 /// Run the collector loop until cancelled (Ctrl-C).
 pub async fn run(cfg: CollectorConfig) -> anyhow::Result<()> {
-    let client = Client::builder()
-        .timeout(Duration::from_secs(10))
-        .build()?;
+    let client = Client::builder().timeout(Duration::from_secs(10)).build()?;
     info!(
         endpoints = ?cfg.kme_endpoints,
         interval_s = cfg.status_interval.as_secs(),
@@ -304,7 +299,9 @@ mod tests {
         let status = fixture_status(0.018, 100);
         let ev = build_kme_event("http://kme.example/api/v1", &status, LinkHealth::Ok, None);
         assert_eq!(ev.asset.kind, AssetKind::QkdKme);
-        let cp = ev.channel_protection.expect("must populate channel_protection");
+        let cp = ev
+            .channel_protection
+            .expect("must populate channel_protection");
         assert_eq!(cp.state, ChannelState::QkdHybridPsk);
         assert_eq!(cp.link_health, LinkHealth::Ok);
         assert_eq!(cp.link_qber, Some(0.018));

@@ -186,7 +186,9 @@ pub fn primitive_from_supported_group(name: &str) -> Option<Primitive> {
         // ML-KEM (FIPS 203) — pure PQ
         "MLKEM512" | "mlkem512" | "ML-KEM-512" => ("ML-KEM-512", Some(true), Some(NistLevel::L1)),
         "MLKEM768" | "mlkem768" | "ML-KEM-768" => ("ML-KEM-768", Some(true), Some(NistLevel::L3)),
-        "MLKEM1024" | "mlkem1024" | "ML-KEM-1024" => ("ML-KEM-1024", Some(true), Some(NistLevel::L5)),
+        "MLKEM1024" | "mlkem1024" | "ML-KEM-1024" => {
+            ("ML-KEM-1024", Some(true), Some(NistLevel::L5))
+        }
         // Hybrid PQ groups (the post-quantum migration deployment pattern)
         "X25519MLKEM768" | "x25519mlkem768" | "X25519Kyber768Draft00" => {
             ("X25519+ML-KEM-768", Some(true), Some(NistLevel::L3))
@@ -200,10 +202,7 @@ pub fn primitive_from_supported_group(name: &str) -> Option<Primitive> {
         _ => return None,
     };
     let mut params = serde_json::Map::new();
-    params.insert(
-        "named_group".into(),
-        serde_json::Value::String(name.into()),
-    );
+    params.insert("named_group".into(), serde_json::Value::String(name.into()));
     Some(Primitive {
         role: PrimitiveRole::Kex,
         algorithm: algo.into(),
@@ -273,8 +272,7 @@ mod tests {
 
     #[test]
     fn tls12_ecdhe_rsa_aes_256_gcm_sha384_recovers_all_four_roles() {
-        let prims =
-            primitives_from_tls12_ciphersuite("TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384");
+        let prims = primitives_from_tls12_ciphersuite("TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384");
         assert_eq!(prims.len(), 4);
         let mut by_role = std::collections::HashMap::new();
         for p in &prims {
@@ -282,7 +280,10 @@ mod tests {
         }
         assert_eq!(by_role.get("Kex").map(String::as_str), Some("ECDHE"));
         assert_eq!(by_role.get("Sig").map(String::as_str), Some("RSA"));
-        assert_eq!(by_role.get("Encrypt").map(String::as_str), Some("AES-256-GCM"));
+        assert_eq!(
+            by_role.get("Encrypt").map(String::as_str),
+            Some("AES-256-GCM")
+        );
         assert_eq!(by_role.get("Hash").map(String::as_str), Some("SHA-384"));
     }
 

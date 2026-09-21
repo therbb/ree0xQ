@@ -119,8 +119,8 @@ async fn main() -> Result<()> {
 
     let mut state = AppState::with_store(store, &args.ca_dir, args.admin_token.clone())?;
     if let Some(d) = args.deadline.as_deref() {
-        state.default_deadline = chrono::DateTime::parse_from_rfc3339(d)?
-            .with_timezone(&chrono::Utc);
+        state.default_deadline =
+            chrono::DateTime::parse_from_rfc3339(d)?.with_timezone(&chrono::Utc);
     }
     state.horizon_years = args.horizon_years;
 
@@ -163,11 +163,7 @@ async fn run_tls(args: Args, state: AppState) -> Result<()> {
     // IPs; we always include local loopbacks so an operator
     // doing `curl --cacert ca.crt https://127.0.0.1:8090/...`
     // gets a clean verification path.
-    let mut sans: Vec<String> = vec![
-        "localhost".into(),
-        "127.0.0.1".into(),
-        "::1".into(),
-    ];
+    let mut sans: Vec<String> = vec!["localhost".into(), "127.0.0.1".into(), "::1".into()];
     for extra in &args.tls_sans {
         if !sans.iter().any(|s| s == extra) {
             sans.push(extra.clone());
@@ -190,18 +186,18 @@ async fn run_tls(args: Args, state: AppState) -> Result<()> {
         .listen
         .parse()
         .with_context(|| format!("parse --listen as SocketAddr: {}", args.listen))?;
-    let bootstrap_addr: SocketAddr = args
-        .tls_bootstrap_listen
-        .parse()
-        .with_context(|| {
-            format!(
-                "parse --tls-bootstrap-listen as SocketAddr: {}",
-                args.tls_bootstrap_listen
-            )
-        })?;
+    let bootstrap_addr: SocketAddr = args.tls_bootstrap_listen.parse().with_context(|| {
+        format!(
+            "parse --tls-bootstrap-listen as SocketAddr: {}",
+            args.tls_bootstrap_listen
+        )
+    })?;
 
-    let mtls_config =
-        tls::build_mtls_config(&server_cert.cert_pem, &server_cert.key_pem, &server_cert.ca_cert_pem)?;
+    let mtls_config = tls::build_mtls_config(
+        &server_cert.cert_pem,
+        &server_cert.key_pem,
+        &server_cert.ca_cert_pem,
+    )?;
     let bootstrap_config =
         tls::build_bootstrap_config(&server_cert.cert_pem, &server_cert.key_pem)?;
 

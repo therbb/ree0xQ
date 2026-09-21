@@ -122,9 +122,30 @@ async fn full_ingest_query_loop() {
     };
 
     let events = vec![
-        event(AssetKind::TlsSession, "tls-modern-1", "ree0xq-net", modern_classical_tls(), None, Some(agile.clone())),
-        event(AssetKind::TlsSession, "tls-locked-1", "ree0xq-net", modern_classical_tls(), None, Some(locked.clone())),
-        event(AssetKind::QkdKme, "KME-A", "ree0xq-qkd", vec![], Some(cp_qkd.clone()), None),
+        event(
+            AssetKind::TlsSession,
+            "tls-modern-1",
+            "ree0xq-net",
+            modern_classical_tls(),
+            None,
+            Some(agile.clone()),
+        ),
+        event(
+            AssetKind::TlsSession,
+            "tls-locked-1",
+            "ree0xq-net",
+            modern_classical_tls(),
+            None,
+            Some(locked.clone()),
+        ),
+        event(
+            AssetKind::QkdKme,
+            "KME-A",
+            "ree0xq-qkd",
+            vec![],
+            Some(cp_qkd.clone()),
+            None,
+        ),
     ];
 
     let r = client
@@ -148,7 +169,11 @@ async fn full_ingest_query_loop() {
     assert_eq!(body["count"], 3);
 
     // /v1/inventory
-    let r = client.get(format!("{base}/v1/inventory")).send().await.unwrap();
+    let r = client
+        .get(format!("{base}/v1/inventory"))
+        .send()
+        .await
+        .unwrap();
     let body: serde_json::Value = r.json().await.unwrap();
     assert_eq!(body["count"], 3);
     let items = body["items"].as_array().unwrap();
@@ -165,23 +190,38 @@ async fn full_ingest_query_loop() {
         .unwrap()["q"]
         .as_f64()
         .unwrap();
-    assert!(q_locked > q_modern, "locked must rank above modern; got {q_locked} vs {q_modern}");
+    assert!(
+        q_locked > q_modern,
+        "locked must rank above modern; got {q_locked} vs {q_modern}"
+    );
 
     // /v1/posture
-    let r = client.get(format!("{base}/v1/posture")).send().await.unwrap();
+    let r = client
+        .get(format!("{base}/v1/posture"))
+        .send()
+        .await
+        .unwrap();
     let body: serde_json::Value = r.json().await.unwrap();
     assert_eq!(body["assets"], 3);
     assert_eq!(body["blocked_count"], 1);
     assert!(body["org_q"].as_f64().unwrap() > 0.0);
 
     // /v1/blocked
-    let r = client.get(format!("{base}/v1/blocked")).send().await.unwrap();
+    let r = client
+        .get(format!("{base}/v1/blocked"))
+        .send()
+        .await
+        .unwrap();
     let body: serde_json::Value = r.json().await.unwrap();
     assert_eq!(body["count"], 1);
     assert_eq!(body["items"][0]["identity"], "tls-locked-1");
 
     // /v1/qkd/links
-    let r = client.get(format!("{base}/v1/qkd/links")).send().await.unwrap();
+    let r = client
+        .get(format!("{base}/v1/qkd/links"))
+        .send()
+        .await
+        .unwrap();
     let body: serde_json::Value = r.json().await.unwrap();
     assert_eq!(body["count"], 1);
     assert_eq!(body["links"][0]["identity"], "KME-A");

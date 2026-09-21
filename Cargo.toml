@@ -14,7 +14,7 @@ members = [
 [workspace.package]
 version       = "0.1.0-dev"
 edition       = "2021"
-rust-version  = "1.78"
+rust-version  = "1.88"
 authors       = ["e2e Solutions <info@e2esolutions.tech>"]
 license       = "MIT"
 repository    = "https://github.com/e2esolutions-tech/ree0xQ"

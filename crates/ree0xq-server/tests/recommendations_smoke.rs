@@ -37,7 +37,12 @@ fn p(role: PrimitiveRole, algo: &str) -> Primitive {
     }
 }
 
-fn ev(source: &str, kind: AssetKind, identity: &str, prims: Vec<Primitive>) -> CryptoInventoryEvent {
+fn ev(
+    source: &str,
+    kind: AssetKind,
+    identity: &str,
+    prims: Vec<Primitive>,
+) -> CryptoInventoryEvent {
     CryptoInventoryEvent {
         schema_version: SCHEMA_VERSION,
         schema_minor: SCHEMA_MINOR,
@@ -118,7 +123,7 @@ async fn recommendations_endpoint_returns_canonical_replacements() {
         .iter()
         .map(|r| r["replacement"].as_str().unwrap())
         .collect();
-    assert!(rsa_recs.iter().any(|r| *r == "ML-DSA-44"));
+    assert!(rsa_recs.contains(&"ML-DSA-44"));
 
     let ec = by_id["sha256:ecdsa-p256"];
     let ec_recs: Vec<&str> = ec["recommendations"]
@@ -127,7 +132,7 @@ async fn recommendations_endpoint_returns_canonical_replacements() {
         .iter()
         .map(|r| r["replacement"].as_str().unwrap())
         .collect();
-    assert!(ec_recs.iter().any(|r| *r == "ML-DSA-65"));
+    assert!(ec_recs.contains(&"ML-DSA-65"));
 
-    assert!(by_id.get("yubihsm/0/ml-dsa-65").is_none());
+    assert!(!by_id.contains_key("yubihsm/0/ml-dsa-65"));
 }

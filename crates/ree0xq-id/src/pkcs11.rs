@@ -102,9 +102,7 @@ where
                 let mut bits: Option<u32> = None;
                 for a in attrs {
                     match a {
-                        Attribute::Label(b) => {
-                            label = String::from_utf8_lossy(&b).to_string()
-                        }
+                        Attribute::Label(b) => label = String::from_utf8_lossy(&b).to_string(),
                         Attribute::KeyType(v) => kt = Some(v),
                         Attribute::ModulusBits(v) => bits = Some(u64::from(v) as u32),
                         _ => {}
@@ -155,4 +153,3 @@ fn class_label(c: ObjectClass) -> &'static str {
         "object"
     }
 }
-

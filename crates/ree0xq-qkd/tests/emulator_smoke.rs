@@ -58,7 +58,13 @@ async fn full_round_trip_through_emulator() {
 
     // /dec_keys for those same keys
     let dec_req = DecKeysRequest {
-        key_IDs: enc.keys.iter().map(|k| DecKeyId { key_id: k.key_id.clone() }).collect(),
+        key_IDs: enc
+            .keys
+            .iter()
+            .map(|k| DecKeyId {
+                key_id: k.key_id.clone(),
+            })
+            .collect(),
     };
     let dec: KeyContainer = client
         .post(format!("{base}/api/v1/keys/SAE-PEER/dec_keys"))
@@ -78,7 +84,9 @@ async fn full_round_trip_through_emulator() {
     // /control: force a failure and confirm /status returns 503
     let resp = client
         .post(format!("{base}/control"))
-        .json(&ControlOp::ForceFailure { reason: "test-induced".into() })
+        .json(&ControlOp::ForceFailure {
+            reason: "test-induced".into(),
+        })
         .send()
         .await
         .unwrap();

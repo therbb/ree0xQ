@@ -22,8 +22,8 @@
 
 use std::path::{Path, PathBuf};
 
-use serde::{Deserialize, Serialize};
 use ree0xq_core::AgilityLevel;
+use serde::{Deserialize, Serialize};
 
 /// One rule in the published ruleset.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -209,6 +209,9 @@ evidence_kind: config_pattern
 "#,
         )
         .unwrap();
-        assert!(matches!(load_ruleset(dir.path()), Err(RuleError::BadRegex { .. })));
+        assert!(matches!(
+            load_ruleset(dir.path()),
+            Err(RuleError::BadRegex { .. })
+        ));
     }
 }

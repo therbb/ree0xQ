@@ -114,8 +114,7 @@ mod tests {
         assert!(is_valid(&fake_addr()));
         // 78 hex chars mix of digits + a-f also works. Build
         // exactly 78 hex chars: 64-char block + 14 more.
-        let body: String =
-            "0123456789abcdef".repeat(4) + "deadbeefdeadbe"; // 64 + 14 = 78
+        let body: String = "0123456789abcdef".repeat(4) + "deadbeefdeadbe"; // 64 + 14 = 78
         assert_eq!(body.len(), 78);
         assert!(is_valid(&format!("Q{body}")));
     }
@@ -137,10 +136,7 @@ mod tests {
     #[test]
     fn primitives_are_xmss_pq_safe() {
         let prims = primitives();
-        let sig = prims
-            .iter()
-            .find(|p| p.role == PrimitiveRole::Sig)
-            .unwrap();
+        let sig = prims.iter().find(|p| p.role == PrimitiveRole::Sig).unwrap();
         assert_eq!(sig.algorithm, "XMSS");
         assert_eq!(sig.pq_resistant, Some(true));
         assert!(prims

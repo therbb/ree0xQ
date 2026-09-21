@@ -260,8 +260,8 @@ fn run_roadmap(source: &str, plan_path: &str) -> anyhow::Result<()> {
             primitives: it.primitives,
         })
         .collect();
-    let plan_raw = std::fs::read_to_string(plan_path)
-        .with_context(|| format!("read {plan_path}"))?;
+    let plan_raw =
+        std::fs::read_to_string(plan_path).with_context(|| format!("read {plan_path}"))?;
     let plan: Vec<Milestone> = serde_json::from_str(&plan_raw).context("parse plan")?;
     let projection = roadmap::project_roadmap(&snapshots, &plan)?;
     println!("{}", serde_json::to_string_pretty(&projection)?);

@@ -95,7 +95,11 @@ mod tests {
     use super::*;
 
     fn ev(at: u64, op: ControlOp) -> ReplayEvent {
-        ReplayEvent { at_seconds: at, op, label: None }
+        ReplayEvent {
+            at_seconds: at,
+            op,
+            label: None,
+        }
     }
 
     #[test]

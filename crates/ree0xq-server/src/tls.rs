@@ -29,7 +29,10 @@ use rustls::{RootCertStore, ServerConfig};
 /// Build a rustls server config for the bootstrap listener: TLS
 /// with a CA-signed server cert and **no** client-cert
 /// verification. Reachable by any TLS client that trusts the CA.
-pub fn build_bootstrap_config(server_cert_pem: &str, server_key_pem: &str) -> Result<Arc<ServerConfig>> {
+pub fn build_bootstrap_config(
+    server_cert_pem: &str,
+    server_key_pem: &str,
+) -> Result<Arc<ServerConfig>> {
     let (chain, key) = load_pem(server_cert_pem, server_key_pem)?;
     let config = ServerConfig::builder()
         .with_no_client_auth()
@@ -114,7 +117,11 @@ mod tests {
         let d = tempdir().unwrap();
         let ca = Ca::load_or_init(d.path()).unwrap();
         let s = ca
-            .sign_server_cert("ree0xq.local", &["127.0.0.1".into(), "localhost".into()], 30)
+            .sign_server_cert(
+                "ree0xq.local",
+                &["127.0.0.1".into(), "localhost".into()],
+                30,
+            )
             .unwrap();
         let _cfg = build_bootstrap_config(&s.cert_pem, &s.key_pem).unwrap();
     }

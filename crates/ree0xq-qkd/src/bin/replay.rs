@@ -8,8 +8,8 @@ use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 use clap::Parser;
-use reqwest::Client;
 use ree0xq_qkd::replay::ReplayScenario;
+use reqwest::Client;
 use tracing::{info, warn};
 use tracing_subscriber::EnvFilter;
 
@@ -29,7 +29,9 @@ struct Args {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")))
+        .with_env_filter(
+            EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info")),
+        )
         .init();
 
     let args = Args::parse();
@@ -64,7 +66,11 @@ async fn main() -> anyhow::Result<()> {
         if !resp.status().is_success() {
             warn!(at=ev.at_seconds, status=%resp.status(), "control op failed");
         } else {
-            info!(at=ev.at_seconds, label=ev.label.unwrap_or_default(), "applied");
+            info!(
+                at = ev.at_seconds,
+                label = ev.label.unwrap_or_default(),
+                "applied"
+            );
         }
     }
     // Sleep through the rest of the scenario duration so collectors
@@ -75,7 +81,10 @@ async fn main() -> anyhow::Result<()> {
     let elapsed = start.elapsed();
     if scenario_end > elapsed {
         let remaining = scenario_end - elapsed;
-        info!(remaining_s = remaining.as_secs(), "sleeping until scenario end");
+        info!(
+            remaining_s = remaining.as_secs(),
+            "sleeping until scenario end"
+        );
         tokio::time::sleep(remaining).await;
     }
     info!("replay complete");

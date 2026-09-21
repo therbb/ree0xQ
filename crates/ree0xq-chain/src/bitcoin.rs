@@ -115,7 +115,10 @@ pub fn classify(address: &str) -> Option<ScriptType> {
     let lower = trimmed.to_ascii_lowercase();
     // bech32 (SegWit v0 / v1). bech32 is case-insensitive
     // by spec; we lowercase before checking.
-    if let Some(suffix) = lower.strip_prefix("bc1q").or_else(|| lower.strip_prefix("tb1q")) {
+    if let Some(_suffix) = lower
+        .strip_prefix("bc1q")
+        .or_else(|| lower.strip_prefix("tb1q"))
+    {
         // P2WPKH = 32-byte witness program → 38 chars of
         // bech32 data (suffix after the `bc1q` separator).
         // P2WSH  = 32 → 58 chars suffix. We use the total
@@ -128,7 +131,10 @@ pub fn classify(address: &str) -> Option<ScriptType> {
         });
         // P2WPKH on testnet is also 42 (`tb1q…`), matches above.
     }
-    if let Some(_suffix) = lower.strip_prefix("bc1p").or_else(|| lower.strip_prefix("tb1p")) {
+    if let Some(_suffix) = lower
+        .strip_prefix("bc1p")
+        .or_else(|| lower.strip_prefix("tb1p"))
+    {
         if lower.len() == 62 {
             return Some(ScriptType::P2tr);
         }
@@ -251,7 +257,7 @@ mod tests {
         assert_eq!(classify(""), None);
         assert_eq!(classify("not-an-address"), None);
         assert_eq!(classify("4abc"), None); // wrong prefix
-        // Wrong length for bech32 v0:
+                                            // Wrong length for bech32 v0:
         assert_eq!(classify("bc1q123"), None);
     }
 

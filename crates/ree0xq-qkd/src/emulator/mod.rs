@@ -132,16 +132,18 @@ fn generate_keys(state: &mut EmulatorState, count: u32, size_bits: u32) -> Vec<K
         let uuid = Uuid::new_v4().to_string();
         let b64 = base64_encode(&buf);
         state.keys.insert(uuid.clone(), buf);
-        out.push(Key { key_id: uuid, key: b64 });
+        out.push(Key {
+            key_id: uuid,
+            key: b64,
+        });
     }
     out
 }
 
 /// Minimal base64 encoder — avoids adding the `base64` crate.
 fn base64_encode(input: &[u8]) -> String {
-    const ALPHA: &[u8; 64] =
-        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    let mut out = String::with_capacity(((input.len() + 2) / 3) * 4);
+    const ALPHA: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let mut out = String::with_capacity(input.len().div_ceil(3) * 4);
     let mut i = 0;
     while i + 3 <= input.len() {
         let n =
@@ -358,8 +360,11 @@ mod tests {
         // `EmulatorState::new` pre-seeds a key pool to mimic real KME
         // behaviour; the post-condition is "pool grew by 4," not
         // "pool is exactly 4."
-        assert_eq!(st.keys.len(), pool_before + 4,
-                   "generated keys are added to the pool");
+        assert_eq!(
+            st.keys.len(),
+            pool_before + 4,
+            "generated keys are added to the pool"
+        );
     }
 
     #[test]

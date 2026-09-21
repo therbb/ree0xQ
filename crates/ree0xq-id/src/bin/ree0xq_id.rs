@@ -32,6 +32,10 @@ struct Args {
 }
 
 #[derive(Subcommand, Debug)]
+// Variant names become the CLI subcommands (`inventory-scan`,
+// `pkcs11-scan`, ...); dropping the shared `Scan` suffix would
+// rename them and break operator scripts + systemd units.
+#[allow(clippy::enum_variant_names)]
 enum Cmd {
     /// Offline JSON HSM-inventory scanner.
     InventoryScan {
@@ -179,9 +183,10 @@ fn run_pkcs11_scan(
     use ree0xq_id::pkcs11;
 
     let pin = match pin_env {
-        Some(v) => Some(std::env::var(&v).map_err(|_| {
-            anyhow::anyhow!("--pin-env `{v}` not present in process env")
-        })?),
+        Some(v) => Some(
+            std::env::var(&v)
+                .map_err(|_| anyhow::anyhow!("--pin-env `{v}` not present in process env"))?,
+        ),
         None => None,
     };
     info!(?library, ?slot, pin = pin.is_some(), "pkcs11-scan starting");

@@ -57,11 +57,7 @@ async fn pcap_file_to_collector_roundtrip() {
                 .expect("reqwest client");
             let mut count = 0usize;
             live::observe_pcap(fixture_pcap(), |ev| {
-                let r = client
-                    .post(&url)
-                    .json(&ev)
-                    .send()
-                    .expect("POST /v1/events");
+                let r = client.post(&url).json(&ev).send().expect("POST /v1/events");
                 assert!(
                     r.status().is_success(),
                     "collector rejected event: {}",

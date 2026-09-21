@@ -139,9 +139,13 @@ where
                         ev.dst_port
                     );
                     let identity = live::session_identity_for_loader(
-                        ev.src_ip, ev.src_port, ev.dst_ip, ev.dst_port,
+                        ev.src_ip,
+                        ev.src_port,
+                        ev.dst_ip,
+                        ev.dst_port,
                     );
-                    let event = live::build_loader_event(host, identity, summary.msg_kind, primitives);
+                    let event =
+                        live::build_loader_event(host, identity, summary.msg_kind, primitives);
                     stats.events_emitted += 1;
                     on_event(event);
                 }

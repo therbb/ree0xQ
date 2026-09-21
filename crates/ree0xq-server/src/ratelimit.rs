@@ -105,10 +105,7 @@ impl RateLimiter {
 /// `X-Real-IP`) when the server sits behind a reverse proxy, then
 /// the direct peer address, then a constant fallback when neither
 /// is available.
-pub fn client_key(
-    peer: Option<std::net::SocketAddr>,
-    headers: &axum::http::HeaderMap,
-) -> String {
+pub fn client_key(peer: Option<std::net::SocketAddr>, headers: &axum::http::HeaderMap) -> String {
     if let Some(xff) = headers.get("x-forwarded-for").and_then(|v| v.to_str().ok()) {
         if let Some(first) = xff.split(',').next() {
             let first = first.trim();

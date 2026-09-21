@@ -71,7 +71,10 @@ async fn deadlines_endpoint_returns_table_and_filters() {
         .await
         .unwrap();
     let full_count = full["count"].as_u64().unwrap();
-    assert!(full_count >= 5, "expected ≥5 deadline rows; got {full_count}");
+    assert!(
+        full_count >= 5,
+        "expected ≥5 deadline rows; got {full_count}"
+    );
 
     // Jurisdiction filter — US-* prefix.
     let us: serde_json::Value = client
@@ -83,7 +86,10 @@ async fn deadlines_endpoint_returns_table_and_filters() {
         .await
         .unwrap();
     let us_count = us["count"].as_u64().unwrap();
-    assert!(us_count >= 2, "US-* should yield ≥2 entries; got {us_count}");
+    assert!(
+        us_count >= 2,
+        "US-* should yield ≥2 entries; got {us_count}"
+    );
     assert!(us_count < full_count, "US filter must shrink the table");
     for row in us["items"].as_array().unwrap() {
         let j = row["jurisdiction"].as_str().unwrap();
@@ -114,7 +120,6 @@ async fn compat_endpoint_supports_full_stack_and_pair_lookup() {
         .get(format!(
             "{base}/v1/agility/compat?stack=openssl-3.x&algorithm=NOT-A-REAL-ALGO"
         ))
-
         .send()
         .await
         .unwrap();

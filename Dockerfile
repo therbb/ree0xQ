@@ -27,7 +27,7 @@ WORKDIR /src
 # Workspace manifests first so dependency resolution can be cached
 # in its own layer; the next time source files change we only
 # recompile what actually changed.
-COPY Cargo.toml ./
+COPY Cargo.toml Cargo.lock ./
 COPY crates/ree0xq-core/Cargo.toml      crates/ree0xq-core/
 COPY crates/ree0xq-server/Cargo.toml    crates/ree0xq-server/
 COPY crates/ree0xq-net/Cargo.toml       crates/ree0xq-net/
@@ -39,7 +39,7 @@ COPY crates/ree0xq-agility/Cargo.toml   crates/ree0xq-agility/
 
 # Now bring in the real sources and build the server binary.
 COPY crates ./crates
-RUN cargo build --release -p ree0xq-server --bin ree0xq-server
+RUN cargo build --release --locked -p ree0xq-server --bin ree0xq-server
 
 
 FROM debian:${DEBIAN_VERSION}-slim AS runtime

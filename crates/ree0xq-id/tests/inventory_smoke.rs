@@ -77,7 +77,10 @@ async fn inventory_scan_round_trips_through_collector() {
             .build()
             .unwrap();
         let stats = inventory::scan(&inv, |ev| {
-            identities_clone.lock().unwrap().push(ev.asset.identity.clone());
+            identities_clone
+                .lock()
+                .unwrap()
+                .push(ev.asset.identity.clone());
             let r = client.post(&url_clone).json(&ev).send().expect("POST");
             assert!(r.status().is_success(), "{}", r.status());
         });
@@ -114,7 +117,7 @@ async fn inventory_scan_round_trips_through_collector() {
     let prims = pq["primitives"].as_array().unwrap();
     let names: Vec<&str> = prims.iter().map(|p| p.as_str().unwrap()).collect();
     assert!(
-        names.iter().any(|n| *n == "ML-DSA-65"),
+        names.contains(&"ML-DSA-65"),
         "missing ML-DSA-65 in {names:?}"
     );
 }

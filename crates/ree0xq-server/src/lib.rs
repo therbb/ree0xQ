@@ -186,17 +186,17 @@ async fn rate_limit_mw(
 /// don't need to re-check.
 pub fn router_main(state: AppState) -> Router {
     Router::new()
-        .route("/v1/events", post(routes::ingest_one).get(routes::list_events))
+        .route(
+            "/v1/events",
+            post(routes::ingest_one).get(routes::list_events),
+        )
         .route("/v1/events/batch", post(routes::ingest_batch))
         .route("/v1/inventory", get(routes::inventory))
         .route("/v1/posture", get(routes::org_posture))
         .route("/v1/qkd/links", get(routes::qkd_links))
         .route("/v1/blocked", get(routes::blocked_assets))
         .route("/v1/recommendations", get(routes::recommendations))
-        .route(
-            "/v1/agility/deadlines",
-            get(routes::agility_deadlines),
-        )
+        .route("/v1/agility/deadlines", get(routes::agility_deadlines))
         .route("/v1/agility/compat", get(routes::agility_compat))
         .route("/v1/agility/roadmap", post(routes::agility_roadmap))
         .layer(DefaultBodyLimit::max(MAX_BODY_BYTES))

@@ -102,8 +102,7 @@ impl VaultBackend for VaultHttpBackend {
         if !r.status().is_success() {
             return Err(anyhow!("vault LIST returned {}", r.status()));
         }
-        let parsed: VaultListData =
-            r.json().map_err(|e| anyhow!("vault LIST JSON: {e}"))?;
+        let parsed: VaultListData = r.json().map_err(|e| anyhow!("vault LIST JSON: {e}"))?;
         Ok(parsed.data.keys)
     }
 
@@ -124,8 +123,7 @@ impl VaultBackend for VaultHttpBackend {
         if !r.status().is_success() {
             return Err(anyhow!("vault GET returned {}", r.status()));
         }
-        let parsed: VaultCertData =
-            r.json().map_err(|e| anyhow!("vault GET JSON: {e}"))?;
+        let parsed: VaultCertData = r.json().map_err(|e| anyhow!("vault GET JSON: {e}"))?;
         Ok(parsed.data.certificate.into_bytes())
     }
 
@@ -285,10 +283,8 @@ mod tests {
 
     #[test]
     fn list_data_deserialises() {
-        let r: VaultListData = serde_json::from_str(
-            r#"{"data":{"keys":["aa:bb","cc:dd","ee:ff"]}}"#,
-        )
-        .unwrap();
+        let r: VaultListData =
+            serde_json::from_str(r#"{"data":{"keys":["aa:bb","cc:dd","ee:ff"]}}"#).unwrap();
         assert_eq!(r.data.keys, vec!["aa:bb", "cc:dd", "ee:ff"]);
     }
 

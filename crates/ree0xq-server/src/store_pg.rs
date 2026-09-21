@@ -59,9 +59,7 @@ impl PgEventStore {
             .acquire_timeout(Duration::from_secs(DEFAULT_CONNECT_TIMEOUT_S))
             .connect(database_url)
             .await
-            .with_context(|| {
-                format!("connect to Postgres at {}", sanitised_url(database_url))
-            })?;
+            .with_context(|| format!("connect to Postgres at {}", sanitised_url(database_url)))?;
         info!(
             url = %sanitised_url(database_url),
             max_connections,
@@ -72,12 +70,6 @@ impl PgEventStore {
             .await
             .context("run ree0xq-server migrations")?;
         Ok(Self { pool })
-    }
-
-    /// Test helper: borrow the pool directly.
-    #[cfg(test)]
-    pub(crate) fn pool(&self) -> &Pool<Postgres> {
-        &self.pool
     }
 }
 

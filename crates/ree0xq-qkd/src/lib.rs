@@ -40,9 +40,9 @@
 #![deny(missing_docs)]
 #![warn(rust_2018_idioms)]
 
-pub mod etsi014;
 pub mod collector;
 pub mod emulator;
+pub mod etsi014;
 pub mod replay;
 
 /// Identifier for this agent in the `source_module` field of emitted

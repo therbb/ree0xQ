@@ -3,10 +3,10 @@
 //! Three offline address-list scanners ship in V3:
 //!
 //! - `bitcoin-scan`  — P2PKH / P2SH / P2WPKH / P2WSH / P2TR
-//!                     classifier (SEZ-12).
+//!   classifier (SEZ-12).
 //! - `ethereum-scan` — secp256k1-ECDSA + Keccak-256 (SEZ-13).
 //! - `qrl-scan`      — XMSS + SHA-256, PQ-resistant
-//!                     (SEZ-14).
+//!   (SEZ-14).
 //!
 //! Each takes `--addresses <file>` (one address per line,
 //! `-` for stdin, `#` lines skipped) plus the same
@@ -30,6 +30,10 @@ struct Args {
 }
 
 #[derive(Subcommand, Debug)]
+// Variant names become the CLI subcommands (`bitcoin-scan`, ...);
+// dropping the shared `Scan` suffix would rename them and break
+// operator scripts + systemd units.
+#[allow(clippy::enum_variant_names)]
 enum Cmd {
     /// Bitcoin address-type classifier.
     BitcoinScan {
