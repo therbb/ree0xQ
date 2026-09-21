@@ -90,7 +90,7 @@ systemd-units = { unit-name = "ree0xq-server", enable = false, start = false }
 name = "ree0xq-server"
 # RPM rejects `-` in versions; replace the workspace's
 # `0.1.0-dev` with the RPM-friendly `0.1.0~dev`.
-version = "0.1.0~dev"
+version = "0.1.0"
 license = "MIT"
 summary = "ree0xQ collector + REST API + dashboard backend"
 assets = [

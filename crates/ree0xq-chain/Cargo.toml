@@ -48,7 +48,7 @@ assets = [
 
 [package.metadata.generate-rpm]
 name = "ree0xq-chain"
-version = "0.1.0~dev"
+version = "0.1.0"
 license = "MIT"
 summary = "ree0xQ blockchain address-inventory scanner"
 assets = [

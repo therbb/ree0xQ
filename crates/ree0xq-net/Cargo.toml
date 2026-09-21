@@ -100,7 +100,7 @@ systemd-units = { unit-name = "ree0xq-net-live", enable = false, start = false }
 
 [package.metadata.generate-rpm]
 name = "ree0xq-net"
-version = "0.1.0~dev"
+version = "0.1.0"
 license = "MIT"
 summary = "ree0xQ passive TLS handshake observer"
 assets = [

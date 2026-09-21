@@ -46,7 +46,7 @@ assets = [
 
 [package.metadata.generate-rpm]
 name = "ree0xq-agility"
-version = "0.1.0~dev"
+version = "0.1.0"
 license = "MIT"
 summary = "ree0xQ crypto-agility scanner + V5 recommendations CLI"
 assets = [

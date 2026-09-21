@@ -10,6 +10,28 @@ under development and the tag scheme will land with the V1 cut.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-22
+
+First tagged release.
+
+### Build & release
+
+- **CI enabled.** The GitHub Actions workflows parked in
+  `dist/github-workflows/` since SEZ-28 now live in
+  `.github/workflows/`: rust (stable + MSRV), web, paper and a
+  Docker image build run on every PR and push to `main`.
+- **Reproducible builds.** `Cargo.lock` is committed; CI, release
+  and the Dockerfile build with `--locked`.
+- **MSRV raised to 1.88** to match what the dependency tree
+  actually requires (the declared 1.78 no longer compiled).
+- **Container image on GHCR.** Tagged releases push
+  `ghcr.io/<owner>/ree0xq-server:<version>` (plus `:X.Y` and
+  `:latest` for non-pre-releases).
+- **Release guard.** A tag that does not match the workspace
+  version or any crate's RPM package version stops the release.
+- Code is `cargo fmt`-clean and `clippy -D warnings`-clean; lint
+  fixes are behaviour-preserving (CLI subcommand names unchanged).
+
 ### Changed
 
 - **Project renamed: Sezar → ree0xQ.** Repository, crate names
