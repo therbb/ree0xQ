@@ -49,6 +49,23 @@ jobs:
             exit 1
           fi
 
+      # RPM forbids `-` in versions, so each crate hard-codes its
+      # own `[package.metadata.generate-rpm] version` (`0.1.0-dev`
+      # -> `0.1.0~dev`). Those copies are easy to forget on a bump.
+      - name: Compare tag with every RPM package version
+        run: |
+          RPM_VERSION=$(printf '%s' "${GITHUB_REF_NAME#v}" | tr '-' '~')
+          STALE=$(cargo metadata --no-deps --format-version 1 \
+            | jq -r --arg v "$RPM_VERSION" '.packages[]
+                | select(.metadata["generate-rpm"].version? // $v | . != $v)
+                | "\(.name): \(.metadata["generate-rpm"].version)"')
+          if [ -n "$STALE" ]; then
+            echo "::error::RPM versions do not match $RPM_VERSION:"
+            echo "$STALE"
+            exit 1
+          fi
+          echo "all RPM package versions = $RPM_VERSION"
+
   image:
     name: container image -> GHCR
     needs: verify-version
