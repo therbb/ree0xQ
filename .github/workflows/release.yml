@@ -1,8 +1,9 @@
 # Release workflow — fires when a tag matching `v*` is pushed.
 #
-# Builds .deb + .rpm for every shipping binary plus the paper
-# submission bundle, then publishes them as a GitHub Release
-# asset. The workflow does NOT push to crates.io — ree0xQ isn't
+# Verifies the tag matches the workspace version, builds .deb + .rpm
+# for every shipping binary, pushes the ree0xq-server container image
+# to GHCR, builds the paper submission bundle, then publishes them as
+# a GitHub Release asset. The workflow does NOT push to crates.io — ree0xQ isn't
 # published as a library yet.
 #
 # Trigger:
@@ -20,18 +21,77 @@ on:
     tags:
       - "v*"
 
+# Least privilege: read-only by default, each job asks for what it
+# needs (GHCR push, release creation).
 permissions:
-  contents: write   # needed for softprops/action-gh-release
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  packages:
-    name: build .deb + .rpm
+  verify-version:
+    name: tag matches Cargo.toml
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+
+      # Tag `v0.1.0` must ship binaries that report `0.1.0`
+      # (`ree0xq-server --version`, /healthz, package metadata).
+      - name: Compare tag with workspace.package.version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          CARGO_VERSION=$(cargo metadata --no-deps --format-version 1 \
+            | jq -r '.packages[] | select(.name == "ree0xq-server") | .version')
+          echo "tag: $TAG_VERSION  Cargo.toml: $CARGO_VERSION"
+          if [ "$TAG_VERSION" != "$CARGO_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match workspace version $CARGO_VERSION"
+            exit 1
+          fi
+
+  image:
+    name: container image -> GHCR
+    needs: verify-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # push to ghcr.io with GITHUB_TOKEN
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # v0.1.0 -> :0.1.0, :0.1 and :latest; pre-releases
+      # (v0.2.0-rc1) get only their exact tag, never :latest.
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/ree0xq-server
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  packages:
+    name: build .deb + .rpm
+    needs: verify-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
 
       - uses: dtolnay/rust-toolchain@stable
 
@@ -58,16 +118,17 @@ jobs:
           (cd release && sha256sum *.{deb,rpm} > SHA256SUMS)
           ls -lh release/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: packages
           path: release/*
 
   paper-bundle:
     name: paper submission bundle
+    needs: verify-version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Pandoc + WeasyPrint
         run: |
@@ -79,28 +140,30 @@ jobs:
       - name: Build both submission bundles
         run: ./scripts/paper-submission-package.sh both
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: paper-bundles
           path: dist/paper/*.zip
 
   publish:
     name: publish GitHub release
-    needs: [packages, paper-bundle]
+    needs: [packages, image, paper-bundle]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # create the GitHub Release
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: packages
           path: release/
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: paper-bundles
           path: release/
 
       - name: Publish release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: release/*
           generate_release_notes: true

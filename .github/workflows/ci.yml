@@ -4,7 +4,9 @@
 #   1. cargo-check + cargo-clippy + cargo-test on stable + MSRV.
 #   2. cargo-fmt --check.
 #   3. web build (TypeScript type-check + Vite production bundle).
-#   4. paper build (Pandoc + WeasyPrint → re-renders both PDFs to
+#   4. docker build of the collector image (no push) so a broken
+#      Dockerfile is caught on the PR, not at release time.
+#   5. paper build (Pandoc + WeasyPrint → re-renders both PDFs to
 #      catch broken citations / missing figures; PDFs are only
 #      published from the manual release pipeline, not from CI).
 #
@@ -45,7 +47,7 @@ jobs:
       matrix:
         toolchain: [stable, "1.88"]   # 1.88 = workspace.package.rust-version
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@master
@@ -82,9 +84,9 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
           cache: npm
@@ -108,7 +110,7 @@ jobs:
     name: paper (Pandoc + WeasyPrint)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Pandoc + WeasyPrint
         run: |
@@ -134,9 +136,29 @@ jobs:
           done
 
       - name: Upload PDFs as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: paper-pdfs
           path: docs/paper/build/*.pdf
           if-no-files-found: error
           retention-days: 14
+
+  docker:
+    name: docker build (no push)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      # Same Dockerfile the release pipeline pushes to GHCR; here we
+      # only prove it still builds. Layer cache lives in the GitHub
+      # Actions cache so unchanged dependency layers are reused.
+      - name: Build ree0xq-server image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          tags: ree0xq-server:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

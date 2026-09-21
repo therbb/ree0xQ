@@ -8,6 +8,7 @@ Fires on every push to `main` and every PR. Jobs:
 |-------|-----------------------------------------------------------|---------------------|
 | rust  | `cargo check / clippy / fmt --check / test` on stable + MSRV (1.88), `--locked` against the committed `Cargo.lock`. Treats warnings as errors. | matrix: stable, 1.88 |
 | web   | `npm ci && npm run build` (tsc + Vite). Fails if the gzipped JS bundle exceeds the 300 KB budget. | ubuntu-latest |
+| docker | Builds the `ree0xq-server` image from `Dockerfile` (no push) with GitHub Actions layer cache. | ubuntu-latest |
 | paper | Installs Pandoc + WeasyPrint, runs `docs/paper/build.sh`, verifies both PDFs exist + non-empty. Uploads PDFs as a 14-day artifact. | ubuntu-latest |
 
 The Postgres testcontainers test on `ree0xq-server` auto-skips
@@ -18,7 +19,11 @@ it's built out-of-band per its own README.
 
 ## `release.yml`
 
-Fires when a tag matching `v*` is pushed. Builds `.deb` + `.rpm`
+Fires when a tag matching `v*` is pushed. First checks the tag
+equals `workspace.package.version` in `Cargo.toml` (so bump the
+version before tagging). Pushes the collector image to
+`ghcr.io/<owner>/ree0xq-server` (`:X.Y.Z`, `:X.Y`, and `:latest`
+for non-pre-releases), and builds `.deb` + `.rpm`
 for every shipping binary (see `docs/operator-packaging.md`)
 plus the paper submission bundle (see
 `scripts/paper-submission-package.sh`). Publishes everything as
